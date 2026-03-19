@@ -2,12 +2,13 @@ package org.example.backend.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
 @Data
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -24,4 +25,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private int xp = 0;
+
+    @Column(nullable = false)
+    private int level = 1;
 }

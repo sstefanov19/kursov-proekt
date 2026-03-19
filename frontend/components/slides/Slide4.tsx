@@ -24,7 +24,7 @@ export default function Slide4({ onNext, onSkip }: Props) {
       </View>
       <Text style={styles.stepText}>STEP 4/4</Text>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.title}>For grown-ups</Text>
           <Text style={styles.subtitle}>
@@ -110,8 +110,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   card: {
     backgroundColor: '#FFFFFF',

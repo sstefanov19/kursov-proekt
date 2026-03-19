@@ -25,7 +25,7 @@ export default function OnboardingCarousel() {
   const navigateWithAuth = async (level: string) => {
     const token = await getToken();
     if (token) {
-      router.replace({ pathname: '/game', params: { level } });
+      router.replace('/home');
     } else {
       router.push({ pathname: '/login', params: { level } });
     }

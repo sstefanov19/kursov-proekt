@@ -1,10 +1,8 @@
 package org.example.backend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
 
-@Data
-@AllArgsConstructor
-public class AuthResponse {
-    private String token;
-}
+public record AuthResponse(
+        @NotBlank String token,
+        @NotBlank String username
+) {}

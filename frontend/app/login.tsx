@@ -26,9 +26,16 @@ export default function LoginScreen() {
   const handleSubmit = async () => {
     setError('');
 
-    if (!email.trim() || !password.trim() || (isRegister && !username.trim())) {
-      setError('Please fill in all fields.');
-      return;
+    if (isRegister) {
+      if (!email.trim() || !username.trim() || !password.trim()) {
+        setError('Please fill in all fields.');
+        return;
+      }
+    } else {
+      if (!username.trim() || !password.trim()) {
+        setError('Please fill in all fields.');
+        return;
+      }
     }
 
     setLoading(true);
@@ -36,9 +43,9 @@ export default function LoginScreen() {
       if (isRegister) {
         await register(email.trim(), username.trim(), password);
       } else {
-        await login(email.trim(), password);
+        await login(username.trim(), password);
       }
-      router.replace({ pathname: '/game', params: { level: (level as string) || 'Medium' } });
+      router.replace('/home');
     } catch (e: any) {
       setError(e.message || 'Something went wrong.');
     } finally {
@@ -70,32 +77,32 @@ export default function LoginScreen() {
             </View>
           ) : null}
 
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="you@example.com"
-            placeholderTextColor="#94A3B8"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={email}
-            onChangeText={setEmail}
-          />
-
           {isRegister && (
             <>
-              <Text style={styles.label}>Username</Text>
+              <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Choose a username"
+                placeholder="you@example.com"
                 placeholderTextColor="#94A3B8"
+                keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
-                value={username}
-                onChangeText={setUsername}
+                value={email}
+                onChangeText={setEmail}
               />
             </>
           )}
+
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your username"
+            placeholderTextColor="#94A3B8"
+            autoCapitalize="none"
+            autoCorrect={false}
+            value={username}
+            onChangeText={setUsername}
+          />
 
           <Text style={styles.label}>Password</Text>
           <TextInput
