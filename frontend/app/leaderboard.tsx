@@ -12,9 +12,11 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { fetchLeaderboard, fetchMyStats, getUsername } from '../services/auth';
 import type { LeaderboardEntry } from '../services/auth';
+import { useTranslation } from '../i18n';
 
 export default function LeaderboardScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -83,18 +85,18 @@ export default function LeaderboardScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
+          <Text style={styles.backText}>{t('back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Leaderboard</Text>
+        <Text style={styles.title}>{t('leaderboard_title')}</Text>
         <View style={styles.backBtn} />
       </View>
 
       {/* My Rank Banner */}
       {myRank > 0 && (
         <View style={styles.myRankBanner}>
-          <Text style={styles.myRankLabel}>YOUR RANK</Text>
+          <Text style={styles.myRankLabel}>{t('leaderboard_your_rank').toUpperCase()}</Text>
           <Text style={styles.myRankValue}>#{myRank}</Text>
-          <Text style={styles.myRankSub}>out of {totalUsers} players</Text>
+          <Text style={styles.myRankSub}>{totalUsers} players</Text>
         </View>
       )}
 
@@ -105,7 +107,7 @@ export default function LeaderboardScreen() {
         </View>
       ) : entries.length === 0 ? (
         <View style={styles.loadingContainer}>
-          <Text style={styles.emptyText}>No players yet. Be the first!</Text>
+          <Text style={styles.emptyText}>{t('leaderboard_empty')}</Text>
         </View>
       ) : (
         <FlatList
@@ -125,7 +127,7 @@ export default function LeaderboardScreen() {
             onPress={goPrev}
             disabled={page === 0}
           >
-            <Text style={[styles.pageBtnText, page === 0 && styles.pageBtnTextDisabled]}>← Prev</Text>
+            <Text style={[styles.pageBtnText, page === 0 && styles.pageBtnTextDisabled]}>{t('leaderboard_prev')}</Text>
           </TouchableOpacity>
           <Text style={styles.pageInfo}>{page + 1} / {totalPages}</Text>
           <TouchableOpacity
@@ -133,7 +135,7 @@ export default function LeaderboardScreen() {
             onPress={goNext}
             disabled={page >= totalPages - 1}
           >
-            <Text style={[styles.pageBtnText, page >= totalPages - 1 && styles.pageBtnTextDisabled]}>Next →</Text>
+            <Text style={[styles.pageBtnText, page >= totalPages - 1 && styles.pageBtnTextDisabled]}>{t('leaderboard_next')}</Text>
           </TouchableOpacity>
         </View>
       )}

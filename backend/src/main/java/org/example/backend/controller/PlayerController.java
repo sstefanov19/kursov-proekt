@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.AddXpRequest;
+import org.example.backend.dto.EquipPerkRequest;
 import org.example.backend.dto.LeaderboardPage;
 import org.example.backend.dto.PlayerStats;
 import org.example.backend.service.PlayerService;
@@ -29,6 +30,11 @@ public class PlayerController {
         String username = auth.getName();
         PlayerStats stats = playerService.getStats(username);
         return ResponseEntity.ok(stats);
+    }
+
+    @PostMapping("/perk")
+    public ResponseEntity<PlayerStats> equipPerk(Authentication auth, @RequestBody EquipPerkRequest request) {
+        return ResponseEntity.ok(playerService.equipPerk(auth.getName(), request.perk()));
     }
 
     @GetMapping("/leaderboard")

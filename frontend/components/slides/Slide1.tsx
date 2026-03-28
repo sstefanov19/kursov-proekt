@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, Image } from 'react-native';
 import Header from '../Header';
 
 const { width } = Dimensions.get('window');
@@ -14,12 +14,13 @@ export default function Slide1({ onNext, onSkip }: Props) {
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
       
-      {/* Background Graphic Placeholder */}
+      {/* Character Graphic */}
       <View style={styles.graphicContainer}>
-        {/* Placeholder for the large 3D character graphic */}
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.placeholderText}>Character Illustration Placeholder</Text>
-        </View>
+        <Image
+          source={require('../../public/character.png')}
+          style={styles.characterImage}
+          resizeMode="contain"
+        />
       </View>
 
       <View style={styles.contentContainer}>
@@ -65,17 +66,9 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     position: 'relative',
   },
-  imagePlaceholder: {
+  characterImage: {
     width: width * 0.8,
     height: width * 0.8,
-    backgroundColor: '#E0E7FF',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    color: '#818CF8',
-    fontWeight: '600',
   },
   contentContainer: {
     paddingHorizontal: 24,

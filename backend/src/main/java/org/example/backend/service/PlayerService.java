@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -19,24 +21,87 @@ public class PlayerService {
     private static final int PAGE_SIZE = 20;
     private final UserRepository userRepository;
 
+    // Perk name -> minimum level required
+    private static final Map<String, Integer> PERK_REQUIREMENTS = Map.of(
+            "hint", 3,
+            "shield", 5,
+            "double_xp", 10,
+            "skip", 15,
+            "triple_xp", 20
+    );
+
+    /**
+     * XP required per level, doubling every 5 levels:
+     * Levels 1-5: 100 XP each, Levels 6-10: 200 XP each,
+     * Levels 11-15: 400 XP each, Levels 16-20: 800 XP each, etc.
+     */
+    public static int xpRequiredForLevel(int level) {
+        int tier = (level - 1) / 5; // 0 for levels 1-5, 1 for 6-10, etc.
+        return 100 * (1 << tier);   // 100, 200, 400, 800, ...
+    }
+
+    public static int totalXpForLevel(int level) {
+        int total = 0;
+        for (int l = 1; l < level; l++) {
+            total += xpRequiredForLevel(l);
+        }
+        return total;
+    }
+
+    public static int calculateLevel(int xp) {
+        int level = 1;
+        int remaining = xp;
+        while (remaining >= xpRequiredForLevel(level)) {
+            remaining -= xpRequiredForLevel(level);
+            level++;
+        }
+        return level;
+    }
+
     public PlayerStats addXp(String username, int xpToAdd) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setXp(user.getXp() + xpToAdd);
-        user.setLevel(user.getXp() / 100 + 1);
+        user.setLevel(calculateLevel(user.getXp()));
         userRepository.save(user);
 
-        int rank = userRepository.findRankByXp(user.getXp());
-        return new PlayerStats(user.getUsername(), user.getXp(), user.getLevel(), rank);
+        return toStats(user);
     }
 
     public PlayerStats getStats(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        return toStats(user);
+    }
 
-        int rank = userRepository.findRankByXp(user.getXp());
-        return new PlayerStats(user.getUsername(), user.getXp(), user.getLevel(), rank);
+    public PlayerStats equipPerk(String username, String perk) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (perk == null || perk.isBlank()) {
+            // Unequip
+            user.setActivePerk(null);
+            userRepository.save(user);
+            return toStats(user);
+        }
+
+        if (!PERK_REQUIREMENTS.containsKey(perk)) {
+            throw new RuntimeException("Unknown perk: " + perk);
+        }
+
+        int requiredLevel = PERK_REQUIREMENTS.get(perk);
+        if (user.getLevel() < requiredLevel) {
+            throw new RuntimeException("You need level " + requiredLevel + " to unlock this perk");
+        }
+
+        user.setActivePerk(perk);
+        userRepository.save(user);
+        return toStats(user);
+    }
+
+    public Set<String> getAvailablePerks() {
+        return PERK_REQUIREMENTS.keySet();
     }
 
     public LeaderboardPage getLeaderboard(int page) {
@@ -48,10 +113,21 @@ public class PlayerService {
                         position.getAndIncrement(),
                         u.getUsername(),
                         u.getXp(),
-                        u.getXp() / 100 + 1
+                        calculateLevel(u.getXp())
                 ))
                 .toList();
 
         return new LeaderboardPage(entries, page, userPage.getTotalPages(), userPage.getTotalElements());
+    }
+
+    private PlayerStats toStats(User user) {
+        int rank = userRepository.findRankByXp(user.getXp());
+        return new PlayerStats(
+                user.getUsername(),
+                user.getXp(),
+                user.getLevel(),
+                rank,
+                user.getActivePerk()
+        );
     }
 }

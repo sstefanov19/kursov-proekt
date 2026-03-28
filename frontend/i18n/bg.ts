@@ -1,0 +1,137 @@
+export default {
+  // Common
+  back: '← Назад',
+  loading: 'Зареждане...',
+  cancel: 'Отказ',
+
+  // Onboarding
+  onboarding_title1: 'Добре дошли в Math Adventure!',
+  onboarding_sub1: 'Тръгнете на епично пътешествие в света на числата',
+  onboarding_title2: 'Решавайте предизвикателства',
+  onboarding_sub2: 'Тествайте уменията си с забавни математически задачи',
+  onboarding_title3: 'Печелете награди',
+  onboarding_sub3: 'Спечелете XP, отключете бонуси и се изкачете в класацията',
+  onboarding_title4: 'Готови ли сте?',
+  onboarding_sub4: 'Създайте акаунт или влезте, за да започнете',
+  onboarding_next: 'Напред',
+  onboarding_skip: 'Пропусни',
+  onboarding_play: 'Да започваме!',
+
+  // Login
+  login_title: 'Добре дошли',
+  login_subtitle: 'Влезте, за да продължите приключението',
+  register_title: 'Създаване на акаунт',
+  register_subtitle: 'Присъединете се към математическото приключение',
+  login_username: 'Потребителско име',
+  login_email: 'Имейл',
+  login_password: 'Парола',
+  login_button: 'Вход',
+  register_button: 'Регистрация',
+  login_switch_to_register: 'Нямате акаунт? Регистрирайте се',
+  login_switch_to_login: 'Вече имате акаунт? Влезте',
+
+  // Home
+  home_lvl: 'НИВ',
+  home_rank: 'Класация',
+  home_shop: 'Магазин',
+  home_classes: 'Класове',
+  home_current_level: 'Текущо ниво:',
+  home_xp_to_next: 'XP до следващо ниво',
+  home_rank_label: 'РАНК',
+  home_streak_label: 'СЕРИЯ',
+  home_day: 'Ден',
+  home_days: 'Дни',
+  home_difficulty: 'Трудност',
+  home_easy: 'Лесно',
+  home_medium: 'Средно',
+  home_hard: 'Трудно',
+  home_easy_hint: '10 въпроса · Събиране и изваждане',
+  home_medium_hint: '10 въпроса · Събиране, изваждане и умножение',
+  home_hard_hint: '5 въпроса · Всички операции · Големи числа',
+  home_play_now: 'ИГРАЙ',
+  home_logout: 'Изход',
+
+  // Level names
+  level_1: 'Върховете на събирането',
+  level_2: 'Блатото на изваждането',
+  level_3: 'Планините на умножението',
+  level_4: 'Пустинята на делението',
+  level_5: 'Гората на дробите',
+  level_6: 'Подземието на десетичните',
+  level_7: 'Бездната на алгебрата',
+  level_8: 'Градината на геометрията',
+  level_9: 'Замъкът на висшата математика',
+  level_10: 'Островите на безкрайността',
+  level_default: 'Изследовател',
+
+  // Level titles
+  title_beginner: 'Начинаещ',
+  title_explorer: 'Изследовател',
+  title_adventurer: 'Авантюрист',
+  title_champion: 'Шампион',
+  title_legend: 'Легенда',
+
+  // Game
+  game_score: 'ТОЧКИ',
+  game_quit: 'Напусни играта',
+  game_quit_title: 'Напускане',
+  game_quit_message: 'Сигурни ли сте, че искате да напуснете? XP-то ви ще бъде запазено.',
+  game_quit_confirm: 'Напусни',
+  game_session_complete: 'Сесията приключи!',
+  game_xp_earned: 'спечелени XP',
+  game_perk_active: 'XP бонус активен!',
+  game_back_home: 'Към началото',
+  game_use_hint: '💡 Подсказка',
+  game_skip_question: '⏭️ Пропусни',
+  game_shield_ready: '🛡️ Щит готов',
+
+  // Leaderboard
+  leaderboard_title: 'Класация',
+  leaderboard_your_rank: 'Вашият ранг',
+  leaderboard_prev: '← Назад',
+  leaderboard_next: 'Напред →',
+  leaderboard_empty: 'Все още няма играчи',
+  leaderboard_page: 'Страница',
+  leaderboard_of: 'от',
+
+  // Shop
+  shop_title: 'Магазин',
+  shop_subtitle: 'Екипирайте един бонус наведнъж. Отключете повече с повишаване на нивото!',
+  shop_equip: 'Екипирай',
+  shop_unequip: 'Свали',
+  shop_active: 'АКТИВЕН',
+  shop_unlocks_at: 'Отключва се на ниво',
+
+  // Perk names
+  perk_hint: 'Подсказка',
+  perk_shield: 'Щит',
+  perk_double_xp: 'Двоен XP',
+  perk_skip: 'Пропускане',
+  perk_triple_xp: 'Троен XP',
+
+  // Perk descriptions
+  perk_hint_desc: 'Премахва 2 грешни отговора — остават 50/50',
+  perk_shield_desc: 'Един грешен отговор на игра е простен — без наказание',
+  perk_double_xp_desc: '2x XP за всеки верен отговор',
+  perk_skip_desc: 'Пропуснете 1 въпрос на игра без загуба на точки',
+  perk_triple_xp_desc: '3x XP за всеки верен отговор',
+
+  // Classrooms
+  classrooms_title: 'Класни стаи',
+  classrooms_create: 'Създай класна стая',
+  classrooms_join: 'Присъедини се',
+  classrooms_name_placeholder: 'Име на класната стая',
+  classrooms_code_placeholder: 'Въведете код',
+  classrooms_create_btn: 'Създай',
+  classrooms_join_btn: 'Влез',
+  classrooms_empty: 'Няма класни стаи. Създайте или се присъединете!',
+  classrooms_code: 'Код:',
+  classrooms_members: 'членове',
+  classrooms_leave: 'Напусни',
+
+  // Classroom Leaderboard
+  classroom_leaderboard_title: 'Класация на класната стая',
+
+  // Language
+  language: 'Език',
+} as const;
