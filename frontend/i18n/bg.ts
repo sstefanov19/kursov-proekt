@@ -132,6 +132,10 @@ export default {
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Класация на класната стая',
 
+  // Notifications
+  notifications_reminder_title: '🧮 Math Adventure те чака!',
+  notifications_reminder_body: 'Не забравяй да поддържаш своята серия — реши няколко задачи днес!',
+
   // Language
   language: 'Език',
 } as const;
