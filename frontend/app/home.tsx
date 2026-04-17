@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,50 +6,165 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Image,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUsername, getToken, getXp, getStreak, fetchMyStats, clearSession } from '../services/auth';
+import { useTranslation } from '../i18n';
 
-// Level names that match the math adventure theme
-const LEVEL_NAMES: Record<number, string> = {
-  1: 'The Addition Alps',
-  2: 'The Subtraction Swamp',
-  3: 'The Multiplication Mountains',
-  4: 'The Division Desert',
-  5: 'The Fraction Forest',
-  6: 'The Decimal Dungeon',
-  7: 'The Algebra Abyss',
-  8: 'The Geometry Garden',
-  9: 'The Calculus Castle',
-  10: 'The Infinity Isles',
-};
+// ─── Confetti ────────────────────────────────────────────────────────────────
 
-function getLevelName(level: number): string {
-  return LEVEL_NAMES[level] || `Level ${level} Explorer`;
+const CONFETTI_COLORS = ['#FACC15', '#4ADE80', '#60A5FA', '#F87171', '#C084FC', '#FB923C', '#34D399', '#F9A8D4'];
+const SCREEN_H = Dimensions.get('window').height;
+
+function ConfettiPiece({ x, delay, color, size, isCircle }: {
+  x: number; delay: number; color: string; size: number; isCircle: boolean;
+}) {
+  const translateY = useRef(new Animated.Value(-60)).current;
+  const opacity    = useRef(new Animated.Value(1)).current;
+  const rotate     = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(delay),
+      Animated.parallel([
+        Animated.timing(translateY, { toValue: SCREEN_H + 80, duration: 2400, useNativeDriver: true }),
+        Animated.timing(rotate,     { toValue: 1,             duration: 2400, useNativeDriver: true }),
+        Animated.sequence([
+          Animated.delay(1600),
+          Animated.timing(opacity, { toValue: 0, duration: 600, useNativeDriver: true }),
+        ]),
+      ]),
+    ]).start();
+  }, []);
+
+  const spin = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '540deg'] });
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        left: `${x}%` as any,
+        top: 0,
+        width: size,
+        height: isCircle ? size : size * 0.6,
+        borderRadius: isCircle ? size / 2 : 3,
+        backgroundColor: color,
+        opacity,
+        transform: [{ translateY }, { rotate: spin }],
+      }}
+    />
+  );
 }
 
-function getLevelTitle(level: number): string {
-  if (level <= 2) return 'Beginner';
-  if (level <= 4) return 'Explorer';
-  if (level <= 6) return 'Adventurer';
-  if (level <= 8) return 'Champion';
-  return 'Legend';
+function LevelUpOverlay({ visible, level, onDone }: { visible: boolean; level: number; onDone: () => void }) {
+  const scale   = useRef(new Animated.Value(0)).current;
+  const bgOpacity = useRef(new Animated.Value(0)).current;
+
+  const pieces = useMemo(() => Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 96,
+    delay: Math.random() * 900,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    size: 8 + Math.random() * 10,
+    isCircle: Math.random() > 0.5,
+  })), []);
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(scale,     { toValue: 1, useNativeDriver: true, bounciness: 14 }),
+        Animated.timing(bgOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+      ]).start();
+      const t = setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(scale,     { toValue: 0, duration: 300, useNativeDriver: true }),
+          Animated.timing(bgOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+        ]).start(() => onDone());
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [visible]);
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFillObject, { zIndex: 999, opacity: bgOpacity, backgroundColor: 'rgba(0,0,0,0.25)' }]}
+    >
+      {pieces.map(p => <ConfettiPiece key={p.id} {...p} />)}
+      <View style={overlayStyles.center}>
+        <Animated.View style={[overlayStyles.badge, { transform: [{ scale }] }]}>
+          <Text style={overlayStyles.emoji}>🎉</Text>
+          <Text style={overlayStyles.title}>LEVEL UP!</Text>
+          <Text style={overlayStyles.sub}>Level {level}</Text>
+        </Animated.View>
+      </View>
+    </Animated.View>
+  );
+}
+
+const overlayStyles = StyleSheet.create({
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  badge: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 28,
+    paddingVertical: 32,
+    paddingHorizontal: 48,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 16,
+  },
+  emoji: { fontSize: 56, marginBottom: 8 },
+  title: { fontSize: 34, fontWeight: '900', color: '#2563EB', letterSpacing: 1 },
+  sub:   { fontSize: 18, fontWeight: '700', color: '#64748B', marginTop: 4 },
+});
+
+function getLevelName(level: number, t: (key: any) => string): string {
+  const key = `level_${level}` as any;
+  const val = t(key);
+  return val !== key ? val : `Level ${level} ${t('level_default')}`;
+}
+
+function getLevelTitle(level: number, t: (key: any) => string): string {
+  if (level <= 2) return t('title_beginner');
+  if (level <= 4) return t('title_explorer');
+  if (level <= 6) return t('title_adventurer');
+  if (level <= 8) return t('title_champion');
+  return t('title_legend');
 }
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t, lang, setLang } = useTranslation();
   const [username, setUsername] = useState('');
   const [totalXp, setTotalXp] = useState(0);
+  const [playerLevel, setPlayerLevel] = useState(1);
   const [streak, setStreak] = useState(0);
   const [rank, setRank] = useState(0);
   const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Medium');
-
-  const playerLevel = Math.floor(totalXp / 100) + 1;
-  const xpForCurrentLevel = (playerLevel - 1) * 100;
-  const xpForNextLevel = playerLevel * 100;
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const prevLevelRef = useRef<number | null>(null);
+  // XP curve: doubles every 5 levels (100, 100, ..., 200, 200, ..., 400, ...)
+  const xpRequiredForLevel = (lvl: number) => {
+    const tier = Math.floor((lvl - 1) / 5);
+    return 100 * Math.pow(2, tier);
+  };
+  const totalXpForLevel = (lvl: number) => {
+    let total = 0;
+    for (let l = 1; l < lvl; l++) total += xpRequiredForLevel(l);
+    return total;
+  };
+  const xpForCurrentLevel = totalXpForLevel(playerLevel);
+  const xpNeeded = xpRequiredForLevel(playerLevel);
   const xpInLevel = totalXp - xpForCurrentLevel;
-  const xpNeeded = xpForNextLevel - xpForCurrentLevel;
   const progressPercent = xpNeeded > 0 ? Math.min((xpInLevel / xpNeeded) * 100, 100) : 0;
 
   useFocusEffect(
@@ -67,11 +182,17 @@ export default function HomeScreen() {
         const s = await getStreak();
         setStreak(s);
 
-        // Fetch real rank from backend
+        // Fetch real stats from backend
         const stats = await fetchMyStats();
         if (stats) {
           setTotalXp(stats.xp);
           setRank(stats.rank);
+          const newLevel = stats.level;
+          if (prevLevelRef.current !== null && newLevel > prevLevelRef.current) {
+            setShowLevelUp(true);
+          }
+          prevLevelRef.current = newLevel;
+          setPlayerLevel(newLevel);
         }
       };
       loadUser();
@@ -87,7 +208,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        {/* Top Bar — avatar + name/level + XP badge */}
+        {/* Top Bar — avatar + name/level only */}
         <View style={styles.topBar}>
           <View style={styles.topBarLeft}>
             <View style={styles.avatarCircle}>
@@ -97,35 +218,44 @@ export default function HomeScreen() {
             </View>
             <View>
               <Text style={styles.topName}>{username || 'Math Quest'}</Text>
-              <Text style={styles.topLevel}>LVL {playerLevel} {getLevelTitle(playerLevel).toUpperCase()}</Text>
+              <Text style={styles.topLevel}>{t('home_lvl')} {playerLevel} {getLevelTitle(playerLevel, t).toUpperCase()}</Text>
             </View>
           </View>
-          <View style={styles.topBarRight}>
-            <TouchableOpacity style={styles.topBarIconBtn} onPress={() => router.push('/classrooms')}>
-              <Text style={styles.topBarIconBtnText}>🏫</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.leaderboardBtn} onPress={() => router.push('/leaderboard')}>
-              <Text style={styles.leaderboardBtnIcon}>🏆</Text>
-              <Text style={styles.leaderboardBtnText}>#{rank || '—'}</Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+
+        {/* Quick Nav Row */}
+        <View style={styles.navRow}>
+          <TouchableOpacity style={styles.navBtn} onPress={() => router.push('/leaderboard')}>
+            <Text style={styles.navBtnIcon}>🏆</Text>
+            <Text style={styles.navBtnLabel}>{t('home_rank')} #{rank || '—'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navBtn} onPress={() => router.push('/shop')}>
+            <Text style={styles.navBtnIcon}>🛒</Text>
+            <Text style={styles.navBtnLabel}>{t('home_shop')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navBtn} onPress={() => router.push('/classrooms')}>
+            <Text style={styles.navBtnIcon}>🏫</Text>
+            <Text style={styles.navBtnLabel}>{t('home_classes')}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Level Card */}
         <View style={styles.levelCard}>
-          <Text style={styles.levelCardTitle}>Current Level: {playerLevel}</Text>
-          <Text style={styles.levelCardName}>{getLevelName(playerLevel)}</Text>
+          <Text style={styles.levelCardTitle}>{t('home_current_level')} {playerLevel}</Text>
+          <Text style={styles.levelCardName}>{getLevelName(playerLevel, t)}</Text>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
           </View>
-          <Text style={styles.progressText}>{xpInLevel} / {xpNeeded} XP to next level</Text>
+          <Text style={styles.progressText}>{xpInLevel} / {xpNeeded} {t('home_xp_to_next')}</Text>
         </View>
 
-        {/* Character Illustration Placeholder */}
+        {/* Character Illustration */}
         <View style={styles.characterContainer}>
-          <View style={styles.characterPlaceholder}>
-            <Text style={styles.characterEmoji}>🦸</Text>
-          </View>
+          <Image
+            source={require('../public/character.png')}
+            style={styles.characterImage}
+            resizeMode="contain"
+          />
         </View>
 
         {/* Stat Badges — Rank & Streak */}
@@ -135,7 +265,7 @@ export default function HomeScreen() {
               <Text style={styles.statIconText}>🏅</Text>
             </View>
             <View>
-              <Text style={styles.statLabel}>RANK</Text>
+              <Text style={styles.statLabel}>{t('home_rank_label')}</Text>
               <Text style={styles.statValue}>#{rank || '—'}</Text>
             </View>
           </View>
@@ -144,33 +274,36 @@ export default function HomeScreen() {
               <Text style={styles.statIconText}>🔥</Text>
             </View>
             <View>
-              <Text style={styles.statLabel}>STREAK</Text>
-              <Text style={styles.statValue}>{streak} {streak === 1 ? 'Day' : 'Days'}</Text>
+              <Text style={styles.statLabel}>{t('home_streak_label')}</Text>
+              <Text style={styles.statValue}>{streak} {streak === 1 ? t('home_day') : t('home_days')}</Text>
             </View>
           </View>
         </View>
 
         {/* Difficulty Selector */}
         <View style={styles.difficultyCard}>
-          <Text style={styles.difficultyTitle}>Difficulty</Text>
+          <Text style={styles.difficultyTitle}>{t('home_difficulty')}</Text>
           <View style={styles.pillRow}>
-            {(['Easy', 'Medium', 'Hard'] as const).map((d) => (
-              <TouchableOpacity
-                key={d}
-                style={[styles.pill, difficulty === d && styles.pillActive]}
-                onPress={() => setDifficulty(d)}
-              >
-                <Text style={[styles.pillText, difficulty === d && styles.pillTextActive]}>{d}</Text>
-                <Text style={[styles.pillSub, difficulty === d && styles.pillSubActive]}>
-                  {d === 'Easy' ? '5 XP' : d === 'Medium' ? '10 XP' : '20 XP'}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {(['Easy', 'Medium', 'Hard'] as const).map((d) => {
+              const label = d === 'Easy' ? t('home_easy') : d === 'Medium' ? t('home_medium') : t('home_hard');
+              return (
+                <TouchableOpacity
+                  key={d}
+                  style={[styles.pill, difficulty === d && styles.pillActive]}
+                  onPress={() => setDifficulty(d)}
+                >
+                  <Text style={[styles.pillText, difficulty === d && styles.pillTextActive]}>{label}</Text>
+                  <Text style={[styles.pillSub, difficulty === d && styles.pillSubActive]}>
+                    {d === 'Easy' ? '5 XP' : d === 'Medium' ? '10 XP' : '20 XP'}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
           <Text style={styles.difficultyHint}>
-            {difficulty === 'Easy' ? '10 questions · Addition & subtraction'
-              : difficulty === 'Medium' ? '10 questions · Add, subtract & multiply'
-              : '5 questions · All operations · Big numbers'}
+            {difficulty === 'Easy' ? t('home_easy_hint')
+              : difficulty === 'Medium' ? t('home_medium_hint')
+              : t('home_hard_hint')}
           </Text>
         </View>
 
@@ -180,16 +313,30 @@ export default function HomeScreen() {
           onPress={() => router.push({ pathname: '/game', params: { level: difficulty } })}
           activeOpacity={0.85}
         >
-          <Text style={styles.playButtonText}>PLAY NOW</Text>
+          <Text style={styles.playButtonText}>{t('home_play_now')}</Text>
           <Text style={styles.playButtonArrow}>▶</Text>
+        </TouchableOpacity>
+
+        {/* Language Toggle */}
+        <TouchableOpacity
+          style={styles.langToggle}
+          onPress={() => setLang(lang === 'en' ? 'bg' : 'en')}
+        >
+          <Text style={styles.langToggleText}>{lang === 'en' ? '🇧🇬 Български' : '🇬🇧 English'}</Text>
+        </TouchableOpacity>
+
+        {/* DEV: test level-up animation — remove before release */}
+        <TouchableOpacity style={[styles.logoutButton, { marginBottom: 8, backgroundColor: 'rgba(37,99,235,0.08)' }]} onPress={() => setShowLevelUp(true)}>
+          <Text style={[styles.logoutText, { color: '#2563EB' }]}>🎉 Test Level Up</Text>
         </TouchableOpacity>
 
         {/* Logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={styles.logoutText}>{t('home_logout')}</Text>
         </TouchableOpacity>
 
       </ScrollView>
+      <LevelUpOverlay visible={showLevelUp} level={playerLevel} onDone={() => setShowLevelUp(false)} />
     </SafeAreaView>
   );
 }
@@ -243,47 +390,30 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  topBarRight: {
+  navRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    gap: 10,
+    marginBottom: 16,
   },
-  topBarIconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  navBtn: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
+    borderRadius: 16,
+    paddingVertical: 12,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 2,
   },
-  topBarIconBtnText: {
-    fontSize: 18,
+  navBtnIcon: {
+    fontSize: 20,
+    marginBottom: 4,
   },
-  leaderboardBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  leaderboardBtnIcon: {
-    fontSize: 16,
-  },
-  leaderboardBtnText: {
-    fontSize: 15,
-    fontWeight: '800',
+  navBtnLabel: {
+    fontSize: 12,
+    fontWeight: '700',
     color: '#1E2B4D',
   },
 
@@ -337,16 +467,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  characterPlaceholder: {
-    width: 200,
-    height: 200,
-    borderRadius: 24,
-    backgroundColor: '#D9F2E6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  characterEmoji: {
-    fontSize: 100,
+  characterImage: {
+    width: 220,
+    height: 220,
   },
 
   // Stats Row
@@ -483,6 +606,23 @@ const styles = StyleSheet.create({
   },
 
   // Logout
+  langToggle: {
+    paddingVertical: 12,
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  langToggleText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1E2B4D',
+  },
   logoutButton: {
     paddingVertical: 14,
     borderRadius: 30,

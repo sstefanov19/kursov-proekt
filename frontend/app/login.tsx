@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { login, register } from '../services/auth';
+import { useTranslation } from '../i18n';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { level } = useLocalSearchParams();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
@@ -64,11 +66,9 @@ export default function LoginScreen() {
             <Text style={styles.iconEmoji}>🧮</Text>
           </View>
 
-          <Text style={styles.title}>{isRegister ? 'Create Account' : 'Welcome Back'}</Text>
+          <Text style={styles.title}>{isRegister ? t('register_title') : t('login_title')}</Text>
           <Text style={styles.subtitle}>
-            {isRegister
-              ? 'Sign up to save your progress'
-              : 'Log in to continue your adventure'}
+            {isRegister ? t('register_subtitle') : t('login_subtitle')}
           </Text>
 
           {error ? (
@@ -79,7 +79,7 @@ export default function LoginScreen() {
 
           {isRegister && (
             <>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('login_email')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="you@example.com"
@@ -93,7 +93,7 @@ export default function LoginScreen() {
             </>
           )}
 
-          <Text style={styles.label}>Username</Text>
+          <Text style={styles.label}>{t('login_username')}</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter your username"
@@ -104,7 +104,7 @@ export default function LoginScreen() {
             onChangeText={setUsername}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>{t('login_password')}</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter password"
@@ -123,7 +123,7 @@ export default function LoginScreen() {
               <ActivityIndicator color="#FFF" />
             ) : (
               <Text style={styles.buttonText}>
-                {isRegister ? 'Sign Up' : 'Log In'} →
+                {isRegister ? t('register_button') : t('login_button')} →
               </Text>
             )}
           </TouchableOpacity>
@@ -136,9 +136,7 @@ export default function LoginScreen() {
             }}
           >
             <Text style={styles.switchText}>
-              {isRegister
-                ? 'Already have an account? Log In'
-                : "Don't have an account? Sign Up"}
+              {isRegister ? t('login_switch_to_login') : t('login_switch_to_register')}
             </Text>
           </TouchableOpacity>
         </View>

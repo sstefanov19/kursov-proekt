@@ -4,5 +4,6 @@ public record PlayerStats(
         String username,
         int xp,
         int level,
-        int rank
+        int rank,
+        String activePerk
 ) {}

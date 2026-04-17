@@ -12,9 +12,11 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { fetchClassroomLeaderboard, getUsername } from '../services/auth';
 import type { LeaderboardEntry } from '../services/auth';
+import { useTranslation } from '../i18n';
 
 export default function ClassroomLeaderboardScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { code, name } = useLocalSearchParams<{ code: string; name: string }>();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [page, setPage] = useState(0);
@@ -83,11 +85,11 @@ export default function ClassroomLeaderboardScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
+          <Text style={styles.backText}>{t('back')}</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.title}>{name || 'Classroom'}</Text>
-          <Text style={styles.subtitle}>{totalUsers} {totalUsers === 1 ? 'member' : 'members'}  ·  Code: {code}</Text>
+          <Text style={styles.title}>{name || t('classroom_leaderboard_title')}</Text>
+          <Text style={styles.subtitle}>{totalUsers} {t('classrooms_members')}  ·  {t('classrooms_code')} {code}</Text>
         </View>
         <View style={styles.backBtn} />
       </View>
@@ -99,7 +101,7 @@ export default function ClassroomLeaderboardScreen() {
         </View>
       ) : entries.length === 0 ? (
         <View style={styles.loadingContainer}>
-          <Text style={styles.emptyText}>No members yet</Text>
+          <Text style={styles.emptyText}>{t('leaderboard_empty')}</Text>
         </View>
       ) : (
         <FlatList
@@ -119,7 +121,7 @@ export default function ClassroomLeaderboardScreen() {
             onPress={goPrev}
             disabled={page === 0}
           >
-            <Text style={[styles.pageBtnText, page === 0 && styles.pageBtnTextDisabled]}>← Prev</Text>
+            <Text style={[styles.pageBtnText, page === 0 && styles.pageBtnTextDisabled]}>{t('leaderboard_prev')}</Text>
           </TouchableOpacity>
           <Text style={styles.pageInfo}>{page + 1} / {totalPages}</Text>
           <TouchableOpacity
@@ -127,7 +129,7 @@ export default function ClassroomLeaderboardScreen() {
             onPress={goNext}
             disabled={page >= totalPages - 1}
           >
-            <Text style={[styles.pageBtnText, page >= totalPages - 1 && styles.pageBtnTextDisabled]}>Next →</Text>
+            <Text style={[styles.pageBtnText, page >= totalPages - 1 && styles.pageBtnTextDisabled]}>{t('leaderboard_next')}</Text>
           </TouchableOpacity>
         </View>
       )}

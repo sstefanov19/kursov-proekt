@@ -19,9 +19,11 @@ import {
   leaveClassroom,
 } from '../services/auth';
 import type { ClassroomInfo } from '../services/auth';
+import { useTranslation } from '../i18n';
 
 export default function ClassroomsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [classrooms, setClassrooms] = useState<ClassroomInfo[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -86,9 +88,9 @@ export default function ClassroomsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
+          <Text style={styles.backText}>{t('back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Classrooms</Text>
+        <Text style={styles.title}>{t('classrooms_title')}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -101,21 +103,21 @@ export default function ClassroomsScreen() {
             onPress={() => { setShowCreate(!showCreate); setShowJoin(false); setError(''); }}
           >
             <Text style={styles.actionBtnIcon}>+</Text>
-            <Text style={styles.actionBtnText}>Create</Text>
+            <Text style={styles.actionBtnText}>{t('classrooms_create_btn')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionBtn, styles.actionBtnJoin]}
             onPress={() => { setShowJoin(!showJoin); setShowCreate(false); setError(''); }}
           >
             <Text style={styles.actionBtnIcon}>🔗</Text>
-            <Text style={styles.actionBtnText}>Join</Text>
+            <Text style={styles.actionBtnText}>{t('classrooms_join_btn')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Create Form */}
         {showCreate && (
           <View style={styles.formCard}>
-            <Text style={styles.formLabel}>Classroom name</Text>
+            <Text style={styles.formLabel}>{t('classrooms_name_placeholder')}</Text>
             <TextInput
               style={styles.input}
               placeholder="e.g. Math 7B"
@@ -124,7 +126,7 @@ export default function ClassroomsScreen() {
               onChangeText={setNewName}
             />
             <TouchableOpacity style={styles.submitBtn} onPress={handleCreate}>
-              <Text style={styles.submitBtnText}>Create Classroom</Text>
+              <Text style={styles.submitBtnText}>{t('classrooms_create')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -132,7 +134,7 @@ export default function ClassroomsScreen() {
         {/* Join Form */}
         {showJoin && (
           <View style={styles.formCard}>
-            <Text style={styles.formLabel}>Enter join code</Text>
+            <Text style={styles.formLabel}>{t('classrooms_code_placeholder')}</Text>
             <TextInput
               style={styles.input}
               placeholder="e.g. A3F2B1"
@@ -143,7 +145,7 @@ export default function ClassroomsScreen() {
             />
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.submitBtn} onPress={handleJoin}>
-              <Text style={styles.submitBtnText}>Join Classroom</Text>
+              <Text style={styles.submitBtnText}>{t('classrooms_join')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -152,8 +154,8 @@ export default function ClassroomsScreen() {
         {classrooms.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🏫</Text>
-            <Text style={styles.emptyTitle}>No classrooms yet</Text>
-            <Text style={styles.emptySubtitle}>Create one or join with a code from your teacher</Text>
+            <Text style={styles.emptyTitle}>{t('classrooms_empty')}</Text>
+            <Text style={styles.emptySubtitle}></Text>
           </View>
         ) : (
           classrooms.map((c) => (
@@ -161,7 +163,7 @@ export default function ClassroomsScreen() {
               <View style={styles.classroomInfo}>
                 <Text style={styles.classroomName}>{c.name}</Text>
                 <Text style={styles.classroomMeta}>
-                  Code: {c.code}  ·  {c.memberCount} {c.memberCount === 1 ? 'member' : 'members'}
+                  {t('classrooms_code')} {c.code}  ·  {c.memberCount} {t('classrooms_members')}
                 </Text>
               </View>
               <View style={styles.classroomActions}>
@@ -172,7 +174,7 @@ export default function ClassroomsScreen() {
                   <Text style={styles.viewBtnText}>🏆</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.leaveBtn} onPress={() => handleLeave(c)}>
-                  <Text style={styles.leaveBtnText}>Leave</Text>
+                  <Text style={styles.leaveBtnText}>{t('classrooms_leave')}</Text>
                 </TouchableOpacity>
               </View>
             </View>

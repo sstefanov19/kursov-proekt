@@ -31,4 +31,7 @@ public class User {
 
     @Column(nullable = false)
     private int level = 1;
+
+    @Column
+    private String activePerk;
 }

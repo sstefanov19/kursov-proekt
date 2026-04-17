@@ -82,6 +82,24 @@ export interface PlayerStats {
   xp: number;
   level: number;
   rank: number;
+  activePerk: string | null;
+}
+
+export async function equipPerk(perk: string | null): Promise<PlayerStats | null> {
+  try {
+    const token = await getToken();
+    if (!token) return null;
+    const res = await fetch(`${PLAYER_API}/perk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ perk }),
+    });
+    if (res.ok) return await res.json();
+  } catch { /* offline */ }
+  return null;
 }
 
 export interface LeaderboardEntry {
