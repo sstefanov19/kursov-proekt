@@ -1,8 +1,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { addXp, recordGamePlayed, fetchMyStats } from '../services/auth';
 import { useTranslation } from '../i18n';
+
+function triggerHaptic(type: 'correct' | 'wrong' | 'shield') {
+  if (Platform.OS === 'web') return;
+  if (type === 'correct') {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+  } else if (type === 'wrong') {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+  } else {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+  }
+}
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
@@ -157,18 +169,21 @@ export default function GameScreen() {
     setSelectedAnswer(chosen);
 
     if (chosen === question.correctAnswer) {
+      triggerHaptic('correct');
       setFeedback('correct');
       setScore(s => s + xpPerCorrect);
       setXpEarned(x => x + xpPerCorrect);
     } else {
       // Shield perk: forgive one wrong answer
       if (activePerk === 'shield' && !shieldUsed) {
+        triggerHaptic('shield');
         setShieldUsed(true);
         setFeedback(null);
         setSelectedAnswer(null);
         // Don't advance — let them try again (the wrong option stays visible)
         return;
       }
+      triggerHaptic('wrong');
       setFeedback('wrong');
     }
 

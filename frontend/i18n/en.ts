@@ -152,6 +152,10 @@ export default {
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Classroom Leaderboard',
 
+  // Notifications
+  notifications_reminder_title: '🧮 Math Adventure is waiting!',
+  notifications_reminder_body: "Don't break your streak — solve a few problems today!",
+
   // Language
   language: 'Language',
 } as const;
