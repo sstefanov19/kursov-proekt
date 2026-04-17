@@ -27,69 +27,67 @@ export default function TabTwoScreen() {
           style={{
             fontFamily: Fonts.rounded,
           }}>
-          Explore
+          Разгледай
         </ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
+      <ThemedText>Това приложение включва примерен код, който да ви помогне да започнете.</ThemedText>
+      <Collapsible title="Маршрутизиране по файлове">
         <ThemedText>
-          This app has two screens:{' '}
+          Това приложение има два екрана:{' '}
           <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
           <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
         </ThemedText>
         <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
+          Файлът за оформление в <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
+          настройва таб навигацията.
         </ThemedText>
         <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
+          <ThemedText type="link">Научете повече</ThemedText>
         </ExternalLink>
       </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
+      <Collapsible title="Поддръжка за Android, iOS и web">
         <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
+          Можете да отворите проекта на Android, iOS и в браузър. За да стартирате web версията,
+          натиснете <ThemedText type="defaultSemiBold">w</ThemedText> в терминала, който изпълнява проекта.
         </ThemedText>
       </Collapsible>
-      <Collapsible title="Images">
+      <Collapsible title="Изображения">
         <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
+          За статични изображения можете да използвате суфиксите <ThemedText type="defaultSemiBold">@2x</ThemedText> и{' '}
+          <ThemedText type="defaultSemiBold">@3x</ThemedText>, за да осигурите файлове за различни плътности на екрана.
         </ThemedText>
         <Image
           source={require('@/assets/images/react-logo.png')}
           style={{ width: 100, height: 100, alignSelf: 'center' }}
         />
         <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
+          <ThemedText type="link">Научете повече</ThemedText>
         </ExternalLink>
       </Collapsible>
-      <Collapsible title="Light and dark mode components">
+      <Collapsible title="Компоненти за светъл и тъмен режим">
         <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
+          Този шаблон поддържа светъл и тъмен режим. Хукът{' '}
+          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> ви позволява да проверите
+          текущата цветова схема на потребителя и да нагласите цветовете на интерфейса.
         </ThemedText>
         <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
+          <ThemedText type="link">Научете повече</ThemedText>
         </ExternalLink>
       </Collapsible>
-      <Collapsible title="Animations">
+      <Collapsible title="Анимации">
         <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
+          Този шаблон включва пример за анимиран компонент. Компонентът{' '}
+          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> използва мощната{' '}
           <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
             react-native-reanimated
           </ThemedText>{' '}
-          library to create a waving hand animation.
+          библиотека, за да създаде анимация на махаща ръка.
         </ThemedText>
         {Platform.select({
           ios: (
             <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+              Компонентът <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
+              осигурява паралакс ефект за изображението в хедъра.
             </ThemedText>
           ),
         })}

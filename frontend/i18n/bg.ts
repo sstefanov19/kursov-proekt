@@ -1,8 +1,13 @@
 export default {
   // Common
+  app_name: 'Math Adventure',
   back: '← Назад',
   loading: 'Зареждане...',
   cancel: 'Отказ',
+  success: 'Успешно',
+  common_you: 'Вие',
+  common_level: 'Ниво',
+  common_xp_unit: 'XP',
 
   // Onboarding
   onboarding_title1: 'Добре дошли в Math Adventure!',
@@ -16,6 +21,31 @@ export default {
   onboarding_next: 'Напред',
   onboarding_skip: 'Пропусни',
   onboarding_play: 'Да започваме!',
+  onboarding_skip_now: 'Пропусни засега',
+  onboarding_step_2: 'СТЪПКА 2/4',
+  onboarding_step_3: '3/4',
+  onboarding_step_4: 'СТЪПКА 4/4',
+  onboarding_slide1_welcome: 'Добре дошли в',
+  onboarding_slide1_adventure: 'Math Adventure!',
+  onboarding_slide1_subtitle: 'Превърни математиката в епично приключение.',
+  onboarding_slide1_button: 'Започни пътешествието →',
+  onboarding_slide2_title: 'Решавай бързи\nпредизвикателства',
+  onboarding_slide2_card1: 'Отговаряй на забавни\nматематически въпроси.',
+  onboarding_slide2_card2: 'Защитавай замъци и\nпобеждавай босове.',
+  onboarding_slide2_card3: 'Печели монети,\nзвезди и XP.',
+  onboarding_slide3_chest: 'Сандък',
+  onboarding_slide3_title: 'Печели награди,\nдокато учиш',
+  onboarding_slide3_subtitle: 'Събирай монети, отключвай светове и повишавай нивото на своя герой.',
+  onboarding_slide3_growth_level: 'НИВО НА РАЗВИТИЕ',
+  onboarding_slide3_fast_solver: 'БЪРЗ РЕШАВАЧ',
+  onboarding_slide3_gold_star: 'ЗЛАТНА ЗВЕЗДА',
+  onboarding_slide4_title: 'За родители',
+  onboarding_slide4_subtitle: 'Кратки сесии,\nподходящи за възрастта въпроси,\nи проследяване на напредъка.',
+  onboarding_slide4_level_label: 'Изберете ниво по математика',
+  onboarding_slide4_info_title: 'Съобразено с учебната програма',
+  onboarding_slide4_info_desc: 'Нивото "Средно" покрива събиране и изваждане до 100 за възраст 7-8 години.',
+  onboarding_slide4_button: 'Да играем →',
+  onboarding_slide4_secondary: 'Още настройки по-късно',
 
   // Login
   login_title: 'Добре дошли',
@@ -29,6 +59,16 @@ export default {
   register_button: 'Регистрация',
   login_switch_to_register: 'Нямате акаунт? Регистрирайте се',
   login_switch_to_login: 'Вече имате акаунт? Влезте',
+  login_fill_all_fields: 'Моля, попълнете всички полета.',
+  login_email_placeholder: 'imeil@primer.com',
+  login_username_placeholder: 'Въведете потребителско име',
+  login_password_placeholder: 'Въведете парола',
+  login_generic_error: 'Нещо се обърка.',
+  login_invalid_credentials: 'Невалидно потребителско име или парола.',
+  login_failed: 'Неуспешен вход.',
+  registration_failed: 'Неуспешна регистрация.',
+  register_username_taken: 'Потребителското име вече е заето.',
+  register_email_taken: 'Имейлът вече е зает.',
 
   // Home
   home_lvl: 'НИВ',
@@ -50,6 +90,12 @@ export default {
   home_hard_hint: '5 въпроса · Всички операции · Големи числа',
   home_play_now: 'ИГРАЙ',
   home_logout: 'Изход',
+  home_player_fallback: 'Играч',
+  home_level_up_title: 'НОВО НИВО!',
+  home_level_up_sub: 'Ниво',
+  home_test_level_up: '🎉 Тест на ново ниво',
+  home_lang_bg: '🇧🇬 Български',
+  home_lang_en: '🇬🇧 Английски',
 
   // Level names
   level_1: 'Върховете на събирането',
@@ -84,6 +130,14 @@ export default {
   game_use_hint: '💡 Подсказка',
   game_skip_question: '⏭️ Пропусни',
   game_shield_ready: '🛡️ Щит готов',
+  game_difficulty_easy: 'Лесно',
+  game_difficulty_medium: 'Средно',
+  game_difficulty_hard: 'Трудно',
+  game_active_perk_hint: '💡 Подсказка',
+  game_active_perk_shield: '🛡️ Щит',
+  game_active_perk_double_xp: '⚡ 2x XP',
+  game_active_perk_skip: '⏭️ Пропускане',
+  game_active_perk_triple_xp: '🔥 3x XP',
 
   // Leaderboard
   leaderboard_title: 'Класация',
@@ -93,6 +147,7 @@ export default {
   leaderboard_empty: 'Все още няма играчи',
   leaderboard_page: 'Страница',
   leaderboard_of: 'от',
+  leaderboard_players: 'играчи',
 
   // Shop
   shop_title: 'Магазин',
@@ -128,6 +183,13 @@ export default {
   classrooms_code: 'Код:',
   classrooms_members: 'членове',
   classrooms_leave: 'Напусни',
+  classrooms_example_name: 'напр. Математика 7Б',
+  classrooms_example_code: 'напр. A3F2B1',
+  classrooms_created_message: 'Класната стая е създадена! Споделете този код:',
+  classrooms_join_error: 'Неуспешно присъединяване към класна стая.',
+  classrooms_not_found: 'Класната стая не е намерена.',
+  classrooms_leave_confirm_title: 'Напускане на класна стая',
+  classrooms_leave_confirm_message: 'Напускате "{{name}}"?',
 
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Класация на класната стая',

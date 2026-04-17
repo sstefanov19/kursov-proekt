@@ -18,59 +18,58 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Добре дошли!</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText type="subtitle">Стъпка 1: Изпробвайте</ThemedText>
         <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
+          Редактирайте <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>, за да видите промените.
+          Натиснете{' '}
           <ThemedText type="defaultSemiBold">
             {Platform.select({
               ios: 'cmd + d',
               android: 'cmd + m',
               web: 'F12',
             })}
-          </ThemedText>{' '}
-          to open developer tools.
+          </ThemedText>, за да отворите инструментите за разработчици.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <Link href="/modal">
           <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+            <ThemedText type="subtitle">Стъпка 2: Разгледайте</ThemedText>
           </Link.Trigger>
           <Link.Preview />
           <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
+            <Link.MenuAction title="Действие" icon="cube" onPress={() => alert('Натиснато действие')} />
             <Link.MenuAction
-              title="Share"
+              title="Споделяне"
               icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
+              onPress={() => alert('Натиснато споделяне')}
             />
-            <Link.Menu title="More" icon="ellipsis">
+            <Link.Menu title="Още" icon="ellipsis">
               <Link.MenuAction
-                title="Delete"
+                title="Изтриване"
                 icon="trash"
                 destructive
-                onPress={() => alert('Delete pressed')}
+                onPress={() => alert('Натиснато изтриване')}
               />
             </Link.Menu>
           </Link.Menu>
         </Link>
 
         <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+          {`Натиснете раздела Разгледай, за да научите повече за съдържанието на това начално приложение.`}
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Стъпка 3: Започнете начисто</ThemedText>
         <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
+          {`Когато сте готови, изпълнете `}
+          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>, за да получите нова{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> директория. Това ще премести текущата{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> в{' '}
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>

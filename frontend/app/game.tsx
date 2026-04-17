@@ -109,14 +109,6 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { xpPerCorrect: number; totalQuestio
   Hard:   { xpPerCorrect: 20, totalQuestions: 5 },
 };
 
-const PERK_LABELS: Record<string, string> = {
-  hint: '💡 Hint',
-  shield: '🛡️ Shield',
-  double_xp: '⚡ 2x XP',
-  skip: '⏭️ Skip',
-  triple_xp: '🔥 3x XP',
-};
-
 export default function GameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -126,6 +118,18 @@ export default function GameScreen() {
     : 'Medium');
 
   const { xpPerCorrect: baseXp, totalQuestions } = DIFFICULTY_CONFIG[difficulty];
+  const difficultyLabel = difficulty === 'Easy'
+    ? t('game_difficulty_easy')
+    : difficulty === 'Hard'
+      ? t('game_difficulty_hard')
+      : t('game_difficulty_medium');
+  const perkLabels: Record<string, string> = {
+    hint: t('game_active_perk_hint'),
+    shield: t('game_active_perk_shield'),
+    double_xp: t('game_active_perk_double_xp'),
+    skip: t('game_active_perk_skip'),
+    triple_xp: t('game_active_perk_triple_xp'),
+  };
 
   const [activePerk, setActivePerk] = useState<string | null>(null);
   const [question, setQuestion] = useState<Question>(() => generateQuestion(difficulty));
@@ -255,10 +259,10 @@ export default function GameScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.difficultyBadge}>{difficulty}</Text>
+        <Text style={styles.difficultyBadge}>{difficultyLabel}</Text>
         {activePerk && (
           <View style={styles.perkBadge}>
-            <Text style={styles.perkBadgeText}>{PERK_LABELS[activePerk] || activePerk}</Text>
+            <Text style={styles.perkBadgeText}>{perkLabels[activePerk] || activePerk}</Text>
           </View>
         )}
         <Text style={styles.questionCount}>{questionNumber} / {totalQuestions}</Text>

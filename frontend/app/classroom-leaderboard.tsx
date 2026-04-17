@@ -25,7 +25,7 @@ export default function ClassroomLeaderboardScreen() {
   const [loading, setLoading] = useState(true);
   const [myUsername, setMyUsername] = useState('');
 
-  const loadPage = async (p: number) => {
+  const loadPage = useCallback(async (p: number) => {
     if (!code) return;
     setLoading(true);
     const data = await fetchClassroomLeaderboard(code, p);
@@ -34,13 +34,13 @@ export default function ClassroomLeaderboardScreen() {
     setTotalPages(data.totalPages);
     setTotalUsers(data.totalUsers);
     setLoading(false);
-  };
+  }, [code]);
 
   useFocusEffect(
     useCallback(() => {
       loadPage(0);
       getUsername().then((n) => setMyUsername(n || ''));
-    }, [code])
+    }, [loadPage])
   );
 
   const goNext = () => { if (page < totalPages - 1) loadPage(page + 1); };
@@ -70,12 +70,12 @@ export default function ClassroomLeaderboardScreen() {
           </View>
           <View>
             <Text style={[styles.username, isMe && styles.usernameMe]}>
-              {item.username}{isMe ? ' (You)' : ''}
+              {item.username}{isMe ? ` (${t('common_you')})` : ''}
             </Text>
-            <Text style={styles.levelText}>Level {item.level}</Text>
+            <Text style={styles.levelText}>{t('common_level')} {item.level}</Text>
           </View>
         </View>
-        <Text style={styles.xpText}>{item.xp} XP</Text>
+        <Text style={styles.xpText}>{item.xp} {t('common_xp_unit')}</Text>
       </View>
     );
   };

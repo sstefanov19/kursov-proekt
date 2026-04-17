@@ -1,8 +1,13 @@
 export default {
   // Common
+  app_name: 'Math Adventure',
   back: '← Back',
   loading: 'Loading...',
   cancel: 'Cancel',
+  success: 'Success',
+  common_you: 'You',
+  common_level: 'Level',
+  common_xp_unit: 'XP',
 
   // Onboarding
   onboarding_title1: 'Welcome to Math Adventure!',
@@ -16,6 +21,31 @@ export default {
   onboarding_next: 'Next',
   onboarding_skip: 'Skip',
   onboarding_play: "Let's Go!",
+  onboarding_skip_now: 'Skip for now',
+  onboarding_step_2: 'STEP 2/4',
+  onboarding_step_3: '3/4',
+  onboarding_step_4: 'STEP 4/4',
+  onboarding_slide1_welcome: 'Welcome to',
+  onboarding_slide1_adventure: 'Math Adventure!',
+  onboarding_slide1_subtitle: 'Turn math into an epic adventure.',
+  onboarding_slide1_button: 'Start journey →',
+  onboarding_slide2_title: 'Solve quick\nchallenges',
+  onboarding_slide2_card1: 'Answer fun math\nquestions.',
+  onboarding_slide2_card2: 'Defend castles and beat\nbosses.',
+  onboarding_slide2_card3: 'Earn coins, stars, and XP.',
+  onboarding_slide3_chest: 'Chest',
+  onboarding_slide3_title: 'Win rewards as you\nlearn',
+  onboarding_slide3_subtitle: 'Collect coins, unlock worlds, and level up your hero.',
+  onboarding_slide3_growth_level: 'GROWTH LEVEL',
+  onboarding_slide3_fast_solver: 'FAST SOLVER',
+  onboarding_slide3_gold_star: 'GOLD STAR',
+  onboarding_slide4_title: 'For grown-ups',
+  onboarding_slide4_subtitle: 'Short sessions,\nage-appropriate questions,\nand progress tracking.',
+  onboarding_slide4_level_label: 'Choose math level',
+  onboarding_slide4_info_title: 'Curriculum Aligned',
+  onboarding_slide4_info_desc: 'Our "Medium" level covers addition and subtraction up to 100 for ages 7-8.',
+  onboarding_slide4_button: "Let's play →",
+  onboarding_slide4_secondary: 'More settings later',
 
   // Login
   login_title: 'Welcome Back',
@@ -29,6 +59,16 @@ export default {
   register_button: 'Sign Up',
   login_switch_to_register: "Don't have an account? Sign Up",
   login_switch_to_login: 'Already have an account? Log In',
+  login_fill_all_fields: 'Please fill in all fields.',
+  login_email_placeholder: 'you@example.com',
+  login_username_placeholder: 'Enter your username',
+  login_password_placeholder: 'Enter password',
+  login_generic_error: 'Something went wrong.',
+  login_invalid_credentials: 'Invalid username or password.',
+  login_failed: 'Login failed.',
+  registration_failed: 'Registration failed.',
+  register_username_taken: 'Username already taken.',
+  register_email_taken: 'Email already taken.',
 
   // Home
   home_lvl: 'LVL',
@@ -50,6 +90,12 @@ export default {
   home_hard_hint: '5 questions · All operations · Big numbers',
   home_play_now: 'PLAY NOW',
   home_logout: 'Log Out',
+  home_player_fallback: 'Player',
+  home_level_up_title: 'LEVEL UP!',
+  home_level_up_sub: 'Level',
+  home_test_level_up: '🎉 Test Level Up',
+  home_lang_bg: '🇧🇬 Bulgarian',
+  home_lang_en: '🇬🇧 English',
 
   // Level names
   level_1: 'The Addition Alps',
@@ -84,6 +130,14 @@ export default {
   game_use_hint: '💡 Use Hint',
   game_skip_question: '⏭️ Skip Question',
   game_shield_ready: '🛡️ Shield ready',
+  game_difficulty_easy: 'Easy',
+  game_difficulty_medium: 'Medium',
+  game_difficulty_hard: 'Hard',
+  game_active_perk_hint: '💡 Hint',
+  game_active_perk_shield: '🛡️ Shield',
+  game_active_perk_double_xp: '⚡ 2x XP',
+  game_active_perk_skip: '⏭️ Skip',
+  game_active_perk_triple_xp: '🔥 3x XP',
 
   // Leaderboard
   leaderboard_title: 'Leaderboard',
@@ -93,6 +147,7 @@ export default {
   leaderboard_empty: 'No players yet',
   leaderboard_page: 'Page',
   leaderboard_of: 'of',
+  leaderboard_players: 'players',
 
   // Shop
   shop_title: 'Shop',
@@ -128,6 +183,13 @@ export default {
   classrooms_code: 'Code:',
   classrooms_members: 'members',
   classrooms_leave: 'Leave',
+  classrooms_example_name: 'e.g. Math 7B',
+  classrooms_example_code: 'e.g. A3F2B1',
+  classrooms_created_message: 'Classroom created! Share this code:',
+  classrooms_join_error: 'Could not join classroom.',
+  classrooms_not_found: 'Classroom not found.',
+  classrooms_leave_confirm_title: 'Leave Classroom',
+  classrooms_leave_confirm_message: 'Leave "{{name}}"?',
 
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Classroom Leaderboard',

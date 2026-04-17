@@ -31,6 +31,15 @@ export default function ClassroomsScreen() {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
 
+  const localizeClassroomError = (message?: string) => {
+    switch (message) {
+      case 'Classroom not found':
+        return t('classrooms_not_found');
+      default:
+        return message || t('classrooms_join_error');
+    }
+  };
+
   const load = async () => {
     const data = await fetchMyClassrooms();
     setClassrooms(data);
@@ -46,11 +55,11 @@ export default function ClassroomsScreen() {
       setNewName('');
       setShowCreate(false);
       load();
-      const msg = `Classroom created! Share this code:\n\n${result.code}`;
+      const msg = `${t('classrooms_created_message')}\n\n${result.code}`;
       if (Platform.OS === 'web') {
         window.alert(msg);
       } else {
-        Alert.alert('Success', msg);
+        Alert.alert(t('success'), msg);
       }
     }
   };
@@ -64,7 +73,7 @@ export default function ClassroomsScreen() {
       setShowJoin(false);
       load();
     } catch (e: any) {
-      setError(e.message || 'Could not join classroom');
+      setError(localizeClassroomError(e?.message));
     }
   };
 
@@ -74,11 +83,11 @@ export default function ClassroomsScreen() {
       load();
     };
     if (Platform.OS === 'web') {
-      if (window.confirm(`Leave "${c.name}"?`)) doLeave();
+      if (window.confirm(t('classrooms_leave_confirm_message').replace('{{name}}', c.name))) doLeave();
     } else {
-      Alert.alert('Leave Classroom', `Leave "${c.name}"?`, [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Leave', style: 'destructive', onPress: doLeave },
+      Alert.alert(t('classrooms_leave_confirm_title'), t('classrooms_leave_confirm_message').replace('{{name}}', c.name), [
+        { text: t('cancel'), style: 'cancel' },
+        { text: t('classrooms_leave'), style: 'destructive', onPress: doLeave },
       ]);
     }
   };
@@ -120,7 +129,7 @@ export default function ClassroomsScreen() {
             <Text style={styles.formLabel}>{t('classrooms_name_placeholder')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. Math 7B"
+              placeholder={t('classrooms_example_name')}
               placeholderTextColor="#94A3B8"
               value={newName}
               onChangeText={setNewName}
@@ -137,7 +146,7 @@ export default function ClassroomsScreen() {
             <Text style={styles.formLabel}>{t('classrooms_code_placeholder')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. A3F2B1"
+              placeholder={t('classrooms_example_code')}
               placeholderTextColor="#94A3B8"
               autoCapitalize="characters"
               value={joinCode}

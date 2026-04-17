@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from 'react-native';
+import { useTranslation } from '../i18n';
 
 interface HeaderProps {
   onSkip: () => void;
@@ -7,12 +8,14 @@ interface HeaderProps {
 }
 
 export default function Header({ onSkip, showSkip = true }: HeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}><Text style={styles.italic}>Math </Text>Adventure</Text>
       {showSkip && (
         <TouchableOpacity onPress={onSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('onboarding_skip')}</Text>
         </TouchableOpacity>
       )}
     </View>

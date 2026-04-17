@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import Header from '../Header';
+import { useTranslation } from '../../i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function Slide2({ onNext, onSkip }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
@@ -39,13 +42,13 @@ export default function Slide2({ onNext, onSkip }: Props) {
           </View>
         </View>
 
-        <Text style={styles.title}>Solve quick{'\n'}challenges</Text>
+        <Text style={styles.title}>{t('onboarding_slide2_title')}</Text>
 
         <View style={styles.stepContainer}>
           <View style={styles.stepBarBg}>
             <View style={styles.stepBarActive} />
           </View>
-          <Text style={styles.stepText}>STEP 2/4</Text>
+          <Text style={styles.stepText}>{t('onboarding_step_2')}</Text>
         </View>
 
         <View style={styles.cardsContainer}>
@@ -53,26 +56,26 @@ export default function Slide2({ onNext, onSkip }: Props) {
             <View style={[styles.iconBox, { backgroundColor: '#E0E7FF' }]}>
               <Text style={styles.icon}>❓</Text>
             </View>
-            <Text style={styles.cardText}>Answer fun math{'\n'}questions.</Text>
+            <Text style={styles.cardText}>{t('onboarding_slide2_card1')}</Text>
           </View>
 
           <View style={styles.card}>
             <View style={[styles.iconBox, { backgroundColor: '#FEE2E2' }]}>
               <Text style={styles.icon}>⚔️</Text>
             </View>
-            <Text style={styles.cardText}>Defend castles and beat{'\n'}bosses.</Text>
+            <Text style={styles.cardText}>{t('onboarding_slide2_card2')}</Text>
           </View>
 
           <View style={styles.card}>
             <View style={[styles.iconBox, { backgroundColor: '#FEF3C7' }]}>
               <Text style={styles.icon}>🏅</Text>
             </View>
-            <Text style={styles.cardText}>Earn coins, stars, and XP.</Text>
+            <Text style={styles.cardText}>{t('onboarding_slide2_card3')}</Text>
           </View>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={onNext}>
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t('onboarding_next')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

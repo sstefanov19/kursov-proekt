@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import Header from '../Header';
+import { useTranslation } from '../../i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function Slide3({ onNext, onSkip }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
@@ -19,7 +22,7 @@ export default function Slide3({ onNext, onSkip }: Props) {
         <View style={styles.graphicContainer}>
           <View style={styles.circleBg} />
           <View style={styles.yellowSquare}>
-            <Text style={styles.chestPlaceholder}>Chest Img</Text>
+            <Text style={styles.chestPlaceholder}>{t('onboarding_slide3_chest')}</Text>
           </View>
           {/* Floating Badges */}
           <View style={[styles.badge, styles.badgeTopLeft]}>
@@ -35,16 +38,16 @@ export default function Slide3({ onNext, onSkip }: Props) {
           </View>
         </View>
 
-        <Text style={styles.title}>Win rewards as you{'\n'}learn</Text>
+        <Text style={styles.title}>{t('onboarding_slide3_title')}</Text>
         <Text style={styles.subtitle}>
-          Collect coins, unlock worlds, and level up your hero.
+          {t('onboarding_slide3_subtitle')}
         </Text>
 
         <View style={styles.cardsContainer}>
           <View style={styles.levelCard}>
             <View style={styles.levelHeader}>
-              <Text style={styles.levelLabel}>GROWTH LEVEL</Text>
-              <Text style={styles.levelValue}>Lv. 12</Text>
+              <Text style={styles.levelLabel}>{t('onboarding_slide3_growth_level')}</Text>
+              <Text style={styles.levelValue}>{t('common_level')} 12</Text>
             </View>
             <View style={styles.progressBarBg}>
               <View style={styles.progressBarActive} />
@@ -56,26 +59,26 @@ export default function Slide3({ onNext, onSkip }: Props) {
               <View style={[styles.pillIcon, { backgroundColor: '#BBF7D0' }]}>
                 <Text>✨</Text>
               </View>
-              <Text style={styles.pillText}>FAST SOLVER</Text>
+              <Text style={styles.pillText}>{t('onboarding_slide3_fast_solver')}</Text>
             </View>
             <View style={styles.pillCard}>
               <View style={[styles.pillIcon, { backgroundColor: '#FEF08A' }]}>
                 <Text>🏆</Text>
               </View>
-              <Text style={styles.pillText}>GOLD STAR</Text>
+              <Text style={styles.pillText}>{t('onboarding_slide3_gold_star')}</Text>
             </View>
           </View>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={onNext}>
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t('onboarding_next')}</Text>
         </TouchableOpacity>
 
         <View style={styles.dotsContainer}>
           <View style={styles.dot} />
           <View style={styles.dot} />
           <View style={styles.activeDotLabelContainer}>
-            <Text style={styles.activeDotLabel}>3/4</Text>
+            <Text style={styles.activeDotLabel}>{t('onboarding_step_3')}</Text>
           </View>
           <View style={styles.dot} />
         </View>
