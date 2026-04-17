@@ -10,14 +10,13 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { login, register } from '../services/auth';
 import { useTranslation } from '../i18n';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { level } = useLocalSearchParams();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -30,12 +29,12 @@ export default function LoginScreen() {
 
     if (isRegister) {
       if (!email.trim() || !username.trim() || !password.trim()) {
-        setError('Please fill in all fields.');
+        setError(t('login_fill_all_fields'));
         return;
       }
     } else {
       if (!username.trim() || !password.trim()) {
-        setError('Please fill in all fields.');
+        setError(t('login_fill_all_fields'));
         return;
       }
     }
@@ -49,7 +48,12 @@ export default function LoginScreen() {
       }
       router.replace('/home');
     } catch (e: any) {
-      setError(e.message || 'Something went wrong.');
+      const message = e?.message;
+      if (message === 'Login failed' || message === 'Registration failed' || message === 'Something went wrong.') {
+        setError(t('login_generic_error'));
+      } else {
+        setError(message || t('login_generic_error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -82,7 +86,7 @@ export default function LoginScreen() {
               <Text style={styles.label}>{t('login_email')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="you@example.com"
+                placeholder={t('login_email_placeholder')}
                 placeholderTextColor="#94A3B8"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -96,7 +100,7 @@ export default function LoginScreen() {
           <Text style={styles.label}>{t('login_username')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your username"
+            placeholder={t('login_username_placeholder')}
             placeholderTextColor="#94A3B8"
             autoCapitalize="none"
             autoCorrect={false}
@@ -107,7 +111,7 @@ export default function LoginScreen() {
           <Text style={styles.label}>{t('login_password')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter password"
+            placeholder={t('login_password_placeholder')}
             placeholderTextColor="#94A3B8"
             secureTextEntry
             value={password}

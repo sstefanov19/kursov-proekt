@@ -70,9 +70,9 @@ export default function LeaderboardScreen() {
           </View>
           <View>
             <Text style={[styles.username, isMe && styles.usernameMe]}>
-              {item.username}{isMe ? ' (You)' : ''}
+              {item.username}{isMe ? ` (${t('leaderboard_you')})` : ''}
             </Text>
-            <Text style={styles.levelText}>Level {item.level}</Text>
+            <Text style={styles.levelText}>{t('level_label')} {item.level}</Text>
           </View>
         </View>
         <Text style={styles.xpText}>{item.xp} XP</Text>
@@ -96,7 +96,7 @@ export default function LeaderboardScreen() {
         <View style={styles.myRankBanner}>
           <Text style={styles.myRankLabel}>{t('leaderboard_your_rank').toUpperCase()}</Text>
           <Text style={styles.myRankValue}>#{myRank}</Text>
-          <Text style={styles.myRankSub}>{totalUsers} players</Text>
+          <Text style={styles.myRankSub}>{totalUsers} {t('leaderboard_players')}</Text>
         </View>
       )}
 

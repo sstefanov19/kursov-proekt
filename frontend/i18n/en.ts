@@ -1,8 +1,11 @@
 export default {
+  app_name: 'Math Adventure',
+
   // Common
   back: '← Back',
   loading: 'Loading...',
   cancel: 'Cancel',
+  level_label: 'Level',
 
   // Onboarding
   onboarding_title1: 'Welcome to Math Adventure!',
@@ -29,6 +32,11 @@ export default {
   register_button: 'Sign Up',
   login_switch_to_register: "Don't have an account? Sign Up",
   login_switch_to_login: 'Already have an account? Log In',
+  login_fill_all_fields: 'Please fill in all fields.',
+  login_generic_error: 'Something went wrong.',
+  login_email_placeholder: 'you@example.com',
+  login_username_placeholder: 'Enter your username',
+  login_password_placeholder: 'Enter password',
 
   // Home
   home_lvl: 'LVL',
@@ -50,6 +58,9 @@ export default {
   home_hard_hint: '5 questions · All operations · Big numbers',
   home_play_now: 'PLAY NOW',
   home_logout: 'Log Out',
+  home_default_username: 'Player',
+  home_level_up_title: 'LEVEL UP!',
+  home_test_level_up: '🎉 Test Level Up',
 
   // Level names
   level_1: 'The Addition Alps',
@@ -93,6 +104,8 @@ export default {
   leaderboard_empty: 'No players yet',
   leaderboard_page: 'Page',
   leaderboard_of: 'of',
+  leaderboard_players: 'players',
+  leaderboard_you: 'You',
 
   // Shop
   shop_title: 'Shop',
@@ -128,6 +141,13 @@ export default {
   classrooms_code: 'Code:',
   classrooms_members: 'members',
   classrooms_leave: 'Leave',
+  classrooms_name_example: 'e.g. Math 7B',
+  classrooms_code_example: 'e.g. A3F2B1',
+  classrooms_created_title: 'Success',
+  classrooms_created_message: 'Classroom created! Share this code:\n\n{code}',
+  classrooms_join_error: 'Could not join classroom',
+  classrooms_leave_title: 'Leave Classroom',
+  classrooms_leave_message: 'Leave "{name}"?',
 
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Classroom Leaderboard',

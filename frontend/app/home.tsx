@@ -60,7 +60,19 @@ function ConfettiPiece({ x, delay, color, size, isCircle }: {
   );
 }
 
-function LevelUpOverlay({ visible, level, onDone }: { visible: boolean; level: number; onDone: () => void }) {
+function LevelUpOverlay({
+  visible,
+  level,
+  onDone,
+  title,
+  levelLabel,
+}: {
+  visible: boolean;
+  level: number;
+  onDone: () => void;
+  title: string;
+  levelLabel: string;
+}) {
   const scale   = useRef(new Animated.Value(0)).current;
   const bgOpacity = useRef(new Animated.Value(0)).current;
 
@@ -100,8 +112,8 @@ function LevelUpOverlay({ visible, level, onDone }: { visible: boolean; level: n
       <View style={overlayStyles.center}>
         <Animated.View style={[overlayStyles.badge, { transform: [{ scale }] }]}>
           <Text style={overlayStyles.emoji}>🎉</Text>
-          <Text style={overlayStyles.title}>LEVEL UP!</Text>
-          <Text style={overlayStyles.sub}>Level {level}</Text>
+          <Text style={overlayStyles.title}>{title}</Text>
+          <Text style={overlayStyles.sub}>{levelLabel} {level}</Text>
         </Animated.View>
       </View>
     </Animated.View>
@@ -130,7 +142,7 @@ const overlayStyles = StyleSheet.create({
 function getLevelName(level: number, t: (key: any) => string): string {
   const key = `level_${level}` as any;
   const val = t(key);
-  return val !== key ? val : `Level ${level} ${t('level_default')}`;
+  return val !== key ? val : `${t('level_label')} ${level} ${t('level_default')}`;
 }
 
 function getLevelTitle(level: number, t: (key: any) => string): string {
@@ -176,7 +188,7 @@ export default function HomeScreen() {
           return;
         }
         const name = await getUsername();
-        setUsername(name || 'Player');
+        setUsername(name || t('home_default_username'));
         const xp = await getXp();
         setTotalXp(xp);
         const s = await getStreak();
@@ -217,7 +229,7 @@ export default function HomeScreen() {
               </Text>
             </View>
             <View>
-              <Text style={styles.topName}>{username || 'Math Quest'}</Text>
+              <Text style={styles.topName}>{username || t('app_name')}</Text>
               <Text style={styles.topLevel}>{t('home_lvl')} {playerLevel} {getLevelTitle(playerLevel, t).toUpperCase()}</Text>
             </View>
           </View>
@@ -327,7 +339,7 @@ export default function HomeScreen() {
 
         {/* DEV: test level-up animation — remove before release */}
         <TouchableOpacity style={[styles.logoutButton, { marginBottom: 8, backgroundColor: 'rgba(37,99,235,0.08)' }]} onPress={() => setShowLevelUp(true)}>
-          <Text style={[styles.logoutText, { color: '#2563EB' }]}>🎉 Test Level Up</Text>
+          <Text style={[styles.logoutText, { color: '#2563EB' }]}>{t('home_test_level_up')}</Text>
         </TouchableOpacity>
 
         {/* Logout */}
@@ -336,7 +348,13 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
       </ScrollView>
-      <LevelUpOverlay visible={showLevelUp} level={playerLevel} onDone={() => setShowLevelUp(false)} />
+      <LevelUpOverlay
+        visible={showLevelUp}
+        level={playerLevel}
+        onDone={() => setShowLevelUp(false)}
+        title={t('home_level_up_title')}
+        levelLabel={t('level_label')}
+      />
     </SafeAreaView>
   );
 }
