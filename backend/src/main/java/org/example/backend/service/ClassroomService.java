@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.ClassroomResponse;
 import org.example.backend.dto.LeaderboardEntry;
 import org.example.backend.dto.LeaderboardPage;
+import org.example.backend.exception.ClassroomNotFoundException;
+import org.example.backend.exception.UserNotFoundException;
 import org.example.backend.model.Classroom;
 import org.example.backend.model.User;
 import org.example.backend.repository.ClassroomRepository;
@@ -24,8 +26,7 @@ public class ClassroomService {
     private final UserRepository userRepository;
 
     public ClassroomResponse create(String username, String name) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserOrThrow(username);
 
         Classroom classroom = new Classroom();
         classroom.setName(name);
@@ -38,11 +39,8 @@ public class ClassroomService {
     }
 
     public ClassroomResponse join(String username, String code) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Classroom classroom = classroomRepository.findByCode(code.toUpperCase())
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+        User user = getUserOrThrow(username);
+        Classroom classroom = getClassroomByCodeOrThrow(code);
 
         classroom.getMembers().add(user);
         classroomRepository.save(classroom);
@@ -50,19 +48,15 @@ public class ClassroomService {
     }
 
     public void leave(String username, Long classroomId) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+        User user = getUserOrThrow(username);
+        Classroom classroom = getClassroomByIdOrThrow(classroomId);
 
         classroom.getMembers().remove(user);
         classroomRepository.save(classroom);
     }
 
     public List<ClassroomResponse> getMyClassrooms(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserOrThrow(username);
 
         return classroomRepository.findAllByMember(user).stream()
                 .map(this::toResponse)
@@ -70,8 +64,7 @@ public class ClassroomService {
     }
 
     public LeaderboardPage getClassroomLeaderboard(String code, int page) {
-        Classroom classroom = classroomRepository.findByCode(code.toUpperCase())
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+        Classroom classroom = getClassroomByCodeOrThrow(code);
 
         List<User> sorted = classroom.getMembers().stream()
                 .sorted(Comparator.comparingInt(User::getXp).reversed())
@@ -105,6 +98,21 @@ public class ClassroomService {
             code = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         } while (classroomRepository.existsByCode(code));
         return code;
+    }
+
+    private User getUserOrThrow(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    private Classroom getClassroomByCodeOrThrow(String code) {
+        return classroomRepository.findByCode(code.toUpperCase())
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
+    }
+
+    private Classroom getClassroomByIdOrThrow(Long classroomId) {
+        return classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
     }
 
     private ClassroomResponse toResponse(Classroom c) {

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.AuthResponse;
 import org.example.backend.dto.LoginRequest;
 import org.example.backend.dto.RegisterRequest;
+import org.example.backend.exception.DuplicateResourceException;
+import org.example.backend.exception.InvalidCredentialsException;
 import org.example.backend.model.User;
 import org.example.backend.repository.UserRepository;
 import org.example.backend.security.JwtUtil;
@@ -20,10 +22,10 @@ public class UserService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new RuntimeException("Username already taken");
+            throw new DuplicateResourceException("Username already taken");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already taken");
+            throw new DuplicateResourceException("Email already taken");
         }
 
         User user = new User();
@@ -39,10 +41,10 @@ public class UserService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new InvalidCredentialsException("Invalid username or password");
         }
 
         String token = jwtUtil.generateToken(user.getUsername());
