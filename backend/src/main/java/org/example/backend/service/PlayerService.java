@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.LeaderboardEntry;
 import org.example.backend.dto.LeaderboardPage;
 import org.example.backend.dto.PlayerStats;
+import org.example.backend.exception.InvalidPerkException;
+import org.example.backend.exception.PerkRequirementNotMetException;
+import org.example.backend.exception.UserNotFoundException;
 import org.example.backend.model.User;
 import org.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -59,8 +62,7 @@ public class PlayerService {
     }
 
     public PlayerStats addXp(String username, int xpToAdd) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserOrThrow(username);
 
         user.setXp(user.getXp() + xpToAdd);
         user.setLevel(calculateLevel(user.getXp()));
@@ -70,14 +72,12 @@ public class PlayerService {
     }
 
     public PlayerStats getStats(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserOrThrow(username);
         return toStats(user);
     }
 
     public PlayerStats equipPerk(String username, String perk) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserOrThrow(username);
 
         if (perk == null || perk.isBlank()) {
             // Unequip
@@ -87,12 +87,14 @@ public class PlayerService {
         }
 
         if (!PERK_REQUIREMENTS.containsKey(perk)) {
-            throw new RuntimeException("Unknown perk: " + perk);
+            throw new InvalidPerkException("Unknown perk: " + perk);
         }
 
         int requiredLevel = PERK_REQUIREMENTS.get(perk);
         if (user.getLevel() < requiredLevel) {
-            throw new RuntimeException("You need level " + requiredLevel + " to unlock this perk");
+            throw new PerkRequirementNotMetException(
+                    "You need level " + requiredLevel + " to unlock this perk"
+            );
         }
 
         user.setActivePerk(perk);
@@ -118,6 +120,11 @@ public class PlayerService {
                 .toList();
 
         return new LeaderboardPage(entries, page, userPage.getTotalPages(), userPage.getTotalElements());
+    }
+
+    private User getUserOrThrow(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     private PlayerStats toStats(User user) {
