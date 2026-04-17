@@ -1,8 +1,11 @@
 export default {
+  app_name: 'Math Adventure',
+
   // Common
   back: '← Назад',
   loading: 'Зареждане...',
   cancel: 'Отказ',
+  level_label: 'Ниво',
 
   // Onboarding
   onboarding_title1: 'Добре дошли в Math Adventure!',
@@ -29,6 +32,11 @@ export default {
   register_button: 'Регистрация',
   login_switch_to_register: 'Нямате акаунт? Регистрирайте се',
   login_switch_to_login: 'Вече имате акаунт? Влезте',
+  login_fill_all_fields: 'Моля, попълнете всички полета.',
+  login_generic_error: 'Възникна грешка.',
+  login_email_placeholder: 'ivan@example.com',
+  login_username_placeholder: 'Въведете потребителско име',
+  login_password_placeholder: 'Въведете парола',
 
   // Home
   home_lvl: 'НИВ',
@@ -50,6 +58,9 @@ export default {
   home_hard_hint: '5 въпроса · Всички операции · Големи числа',
   home_play_now: 'ИГРАЙ',
   home_logout: 'Изход',
+  home_default_username: 'Играч',
+  home_level_up_title: 'НОВО НИВО!',
+  home_test_level_up: '🎉 Тествай повишение',
 
   // Level names
   level_1: 'Върховете на събирането',
@@ -93,6 +104,8 @@ export default {
   leaderboard_empty: 'Все още няма играчи',
   leaderboard_page: 'Страница',
   leaderboard_of: 'от',
+  leaderboard_players: 'играчи',
+  leaderboard_you: 'Ти',
 
   // Shop
   shop_title: 'Магазин',
@@ -128,6 +141,13 @@ export default {
   classrooms_code: 'Код:',
   classrooms_members: 'членове',
   classrooms_leave: 'Напусни',
+  classrooms_name_example: 'напр. Математика 7Б',
+  classrooms_code_example: 'напр. A3F2B1',
+  classrooms_created_title: 'Успех',
+  classrooms_created_message: 'Класната стая е създадена. Споделете този код:\n\n{code}',
+  classrooms_join_error: 'Неуспешно присъединяване към класната стая',
+  classrooms_leave_title: 'Напускане на класната стая',
+  classrooms_leave_message: 'Да напуснете ли "{name}"?',
 
   // Classroom Leaderboard
   classroom_leaderboard_title: 'Класация на класната стая',

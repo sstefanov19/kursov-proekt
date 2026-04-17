@@ -70,9 +70,9 @@ export default function ClassroomLeaderboardScreen() {
           </View>
           <View>
             <Text style={[styles.username, isMe && styles.usernameMe]}>
-              {item.username}{isMe ? ' (You)' : ''}
+              {item.username}{isMe ? ` (${t('leaderboard_you')})` : ''}
             </Text>
-            <Text style={styles.levelText}>Level {item.level}</Text>
+            <Text style={styles.levelText}>{t('level_label')} {item.level}</Text>
           </View>
         </View>
         <Text style={styles.xpText}>{item.xp} XP</Text>
