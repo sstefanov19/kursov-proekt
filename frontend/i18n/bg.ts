@@ -1,5 +1,5 @@
 export default {
-  app_name: 'Math Adventure',
+  app_name: 'Математическо приключение',
 
   // Common
   back: '← Назад',
@@ -8,7 +8,7 @@ export default {
   level_label: 'Ниво',
 
   // Onboarding
-  onboarding_title1: 'Добре дошли в Math Adventure!',
+  onboarding_title1: 'Добре дошли в Математическо приключение!',
   onboarding_sub1: 'Тръгнете на епично пътешествие в света на числата',
   onboarding_title2: 'Решавайте предизвикателства',
   onboarding_sub2: 'Тествайте уменията си с забавни математически задачи',
@@ -19,6 +19,20 @@ export default {
   onboarding_next: 'Напред',
   onboarding_skip: 'Пропусни',
   onboarding_play: 'Да започваме!',
+  onboarding_skip_for_now: 'Пропусни засега',
+  onboarding_step_2: 'СТЪПКА 2/4',
+  onboarding_step_4: 'СТЪПКА 4/4',
+  onboarding_slide1_cta: 'Започни пътешествието',
+  onboarding_slide2_card1: 'Отговаряй на забавни математически въпроси.',
+  onboarding_slide2_card2: 'Защитавай замъци и побеждавай босове.',
+  onboarding_slide2_card3: 'Печели монети, звезди и XP.',
+  onboarding_slide3_level_label: 'НИВО НА РАЗВИТИЕ',
+  onboarding_slide3_badge_fast: 'БЪРЗ РЕШАВАЧ',
+  onboarding_slide3_badge_gold: 'ЗЛАТНА ЗВЕЗДА',
+  onboarding_slide4_level_label: 'Изберете ниво по математика',
+  onboarding_slide4_info_title: 'Съобразено с учебния материал',
+  onboarding_slide4_info_desc: 'Нивото „Средно“ покрива събиране, изваждане и умножение за деца на 7-8 години.',
+  onboarding_slide4_secondary: 'Още настройки по-късно',
 
   // Login
   login_title: 'Добре дошли',
@@ -61,6 +75,8 @@ export default {
   home_default_username: 'Играч',
   home_level_up_title: 'НОВО НИВО!',
   home_test_level_up: '🎉 Тествай повишение',
+  home_language_toggle_bg: 'Език: Български',
+  home_language_toggle_en: 'Език: Английски',
 
   // Level names
   level_1: 'Върховете на събирането',
@@ -153,7 +169,7 @@ export default {
   classroom_leaderboard_title: 'Класация на класната стая',
 
   // Notifications
-  notifications_reminder_title: '🧮 Math Adventure те чака!',
+  notifications_reminder_title: '🧮 Математическо приключение те чака!',
   notifications_reminder_body: 'Не забравяй да поддържаш своята серия — реши няколко задачи днес!',
 
   // Language

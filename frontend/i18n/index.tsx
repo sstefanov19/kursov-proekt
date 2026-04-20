@@ -14,13 +14,13 @@ const LANG_KEY = 'app_language';
 async function loadLanguage(): Promise<Language> {
   try {
     if (Platform.OS === 'web') {
-      return (localStorage.getItem(LANG_KEY) as Language) || 'en';
+      return (localStorage.getItem(LANG_KEY) as Language) || 'bg';
     }
     const SecureStore = await import('expo-secure-store');
     const val = await SecureStore.getItemAsync(LANG_KEY);
-    return (val as Language) || 'en';
+    return (val as Language) || 'bg';
   } catch {
-    return 'en';
+    return 'bg';
   }
 }
 
@@ -42,13 +42,13 @@ interface I18nContextType {
 }
 
 const I18nContext = createContext<I18nContextType>({
-  lang: 'en',
-  t: (key) => en[key] || key,
+  lang: 'bg',
+  t: (key) => bg[key] || en[key] || key,
   setLang: () => {},
 });
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Language>('en');
+  const [lang, setLangState] = useState<Language>('bg');
 
   useEffect(() => {
     loadLanguage().then(setLangState);
@@ -60,7 +60,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const t = useCallback((key: TranslationKeys): string => {
-    return translations[lang]?.[key] || translations.en[key] || key;
+    return translations[lang]?.[key] || translations.bg[key] || translations.en[key] || key;
   }, [lang]);
 
   return (

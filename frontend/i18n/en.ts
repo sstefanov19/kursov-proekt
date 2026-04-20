@@ -19,6 +19,20 @@ export default {
   onboarding_next: 'Next',
   onboarding_skip: 'Skip',
   onboarding_play: "Let's Go!",
+  onboarding_skip_for_now: 'Skip for now',
+  onboarding_step_2: 'STEP 2/4',
+  onboarding_step_4: 'STEP 4/4',
+  onboarding_slide1_cta: 'Start journey',
+  onboarding_slide2_card1: 'Answer fun math questions.',
+  onboarding_slide2_card2: 'Defend castles and beat bosses.',
+  onboarding_slide2_card3: 'Earn coins, stars, and XP.',
+  onboarding_slide3_level_label: 'GROWTH LEVEL',
+  onboarding_slide3_badge_fast: 'FAST SOLVER',
+  onboarding_slide3_badge_gold: 'GOLD STAR',
+  onboarding_slide4_level_label: 'Choose math level',
+  onboarding_slide4_info_title: 'Curriculum Aligned',
+  onboarding_slide4_info_desc: 'Our "Medium" level covers addition, subtraction, and multiplication for ages 7-8.',
+  onboarding_slide4_secondary: 'More settings later',
 
   // Login
   login_title: 'Welcome Back',
@@ -61,6 +75,8 @@ export default {
   home_default_username: 'Player',
   home_level_up_title: 'LEVEL UP!',
   home_test_level_up: '🎉 Test Level Up',
+  home_language_toggle_bg: 'Language: Bulgarian',
+  home_language_toggle_en: 'Language: English',
 
   // Level names
   level_1: 'The Addition Alps',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, Image } from 'react-native';
 import Header from '../Header';
+import { useTranslation } from '../../i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function Slide1({ onNext, onSkip }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
@@ -24,17 +27,11 @@ export default function Slide1({ onNext, onSkip }: Props) {
       </View>
 
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>
-          Welcome to <Text style={styles.highlight}>Math</Text>{'\n'}
-          <Text style={styles.highlight}>Quest!</Text>
-        </Text>
-        
-        <Text style={styles.subtitle}>
-          Turn math into an epic adventure.
-        </Text>
+        <Text style={styles.title}>{t('onboarding_title1')}</Text>
+        <Text style={styles.subtitle}>{t('onboarding_sub1')}</Text>
 
         <TouchableOpacity style={styles.button} onPress={onNext}>
-          <Text style={styles.buttonText}>Start journey →</Text>
+          <Text style={styles.buttonText}>{t('onboarding_slide1_cta')} →</Text>
         </TouchableOpacity>
 
         <View style={styles.dotsContainer}>
@@ -45,7 +42,7 @@ export default function Slide1({ onNext, onSkip }: Props) {
         </View>
         
         <TouchableOpacity style={styles.skipContainer} onPress={onSkip}>
-          <Text style={styles.skipForNow}>Skip for now</Text>
+          <Text style={styles.skipForNow}>{t('onboarding_skip_for_now')}</Text>
           <Text style={styles.stepCount}>1/4</Text>
         </TouchableOpacity>
       </View>
@@ -82,9 +79,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 42,
-  },
-  highlight: {
-    color: '#0B47D1',
   },
   subtitle: {
     fontSize: 16,
