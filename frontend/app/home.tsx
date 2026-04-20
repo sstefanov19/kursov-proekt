@@ -335,7 +335,7 @@ export default function HomeScreen() {
           onPress={() => setLang(lang === 'en' ? 'bg' : 'en')}
         >
           <Text style={styles.langToggleText}>
-            {lang === 'en' ? t('home_language_toggle_en') : t('home_language_toggle_bg')}
+            {lang === 'en' ? t('home_language_toggle_bg') : t('home_language_toggle_en')}
           </Text>
         </TouchableOpacity>
 
