@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../Header';
-
-const { width } = Dimensions.get('window');
+import { useTranslation } from '../../i18n';
 
 interface Props {
   onNext: (level?: string) => void;
@@ -11,6 +10,13 @@ interface Props {
 
 export default function Slide4({ onNext, onSkip }: Props) {
   const [selectedLevel, setSelectedLevel] = useState('Medium');
+  const { t } = useTranslation();
+
+  const levelLabel = (level: string) => {
+    if (level === 'Easy') return t('home_easy');
+    if (level === 'Hard') return t('home_hard');
+    return t('home_medium');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,16 +28,14 @@ export default function Slide4({ onNext, onSkip }: Props) {
         <View style={styles.dot} />
         <View style={styles.activeDotLine} />
       </View>
-      <Text style={styles.stepText}>STEP 4/4</Text>
+      <Text style={styles.stepText}>{t('onboarding_step_4')}</Text>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
-          <Text style={styles.title}>For grown-ups</Text>
-          <Text style={styles.subtitle}>
-            Short sessions,{'\n'}age-appropriate questions,{'\n'}and progress tracking.
-          </Text>
+          <Text style={styles.title}>{t('onboarding_title4')}</Text>
+          <Text style={styles.subtitle}>{t('onboarding_sub4')}</Text>
 
-          <Text style={styles.levelLabel}>Choose math level</Text>
+          <Text style={styles.levelLabel}>{t('onboarding_slide4_level_label')}</Text>
           <View style={styles.levelCard}>
             {['Easy', 'Medium', 'Hard'].map((lvl) => (
               <TouchableOpacity 
@@ -39,7 +43,9 @@ export default function Slide4({ onNext, onSkip }: Props) {
                 style={selectedLevel === lvl ? styles.levelBtnActive : styles.levelBtnInactive}
                 onPress={() => setSelectedLevel(lvl)}
               >
-                <Text style={selectedLevel === lvl ? styles.levelBtnTextActive : styles.levelBtnTextInactive}>{lvl}</Text>
+                <Text style={selectedLevel === lvl ? styles.levelBtnTextActive : styles.levelBtnTextInactive}>
+                  {levelLabel(lvl)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -49,19 +55,17 @@ export default function Slide4({ onNext, onSkip }: Props) {
               <Text style={styles.icon}>🛡️</Text>
             </View>
             <View style={styles.infoTextContainer}>
-              <Text style={styles.infoTitle}>Curriculum Aligned</Text>
-              <Text style={styles.infoDesc}>
-                Our "Medium" level covers addition and subtraction up to 100 for ages 7-8.
-              </Text>
+              <Text style={styles.infoTitle}>{t('onboarding_slide4_info_title')}</Text>
+              <Text style={styles.infoDesc}>{t('onboarding_slide4_info_desc')}</Text>
             </View>
           </View>
 
           <TouchableOpacity style={styles.button} onPress={() => onNext(selectedLevel)}>
-            <Text style={styles.buttonText}>Let's play →</Text>
+            <Text style={styles.buttonText}>{t('onboarding_play')} →</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.linkButton} onPress={() => onNext(selectedLevel)}>
-            <Text style={styles.linkButtonText}>More settings later</Text>
+            <Text style={styles.linkButtonText}>{t('onboarding_slide4_secondary')}</Text>
           </TouchableOpacity>
         </View>
 

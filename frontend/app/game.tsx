@@ -109,14 +109,6 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { xpPerCorrect: number; totalQuestio
   Hard:   { xpPerCorrect: 20, totalQuestions: 5 },
 };
 
-const PERK_LABELS: Record<string, string> = {
-  hint: '💡 Hint',
-  shield: '🛡️ Shield',
-  double_xp: '⚡ 2x XP',
-  skip: '⏭️ Skip',
-  triple_xp: '🔥 3x XP',
-};
-
 export default function GameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -145,6 +137,21 @@ export default function GameScreen() {
   // XP multiplier from perk
   const xpMultiplier = activePerk === 'double_xp' ? 2 : activePerk === 'triple_xp' ? 3 : 1;
   const xpPerCorrect = baseXp * xpMultiplier;
+
+  const difficultyLabel = difficulty === 'Easy'
+    ? t('home_easy')
+    : difficulty === 'Hard'
+      ? t('home_hard')
+      : t('home_medium');
+
+  const perkLabel = (perk: string) => {
+    if (perk === 'hint') return `💡 ${t('perk_hint')}`;
+    if (perk === 'shield') return `🛡️ ${t('perk_shield')}`;
+    if (perk === 'double_xp') return `⚡ ${t('perk_double_xp')}`;
+    if (perk === 'skip') return `⏭️ ${t('perk_skip')}`;
+    if (perk === 'triple_xp') return `🔥 ${t('perk_triple_xp')}`;
+    return perk;
+  };
 
   useEffect(() => {
     fetchMyStats().then((s) => {
@@ -255,10 +262,10 @@ export default function GameScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.difficultyBadge}>{difficulty}</Text>
+        <Text style={styles.difficultyBadge}>{difficultyLabel}</Text>
         {activePerk && (
           <View style={styles.perkBadge}>
-            <Text style={styles.perkBadgeText}>{PERK_LABELS[activePerk] || activePerk}</Text>
+            <Text style={styles.perkBadgeText}>{perkLabel(activePerk)}</Text>
           </View>
         )}
         <Text style={styles.questionCount}>{questionNumber} / {totalQuestions}</Text>

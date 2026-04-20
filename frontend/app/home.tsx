@@ -39,7 +39,7 @@ function ConfettiPiece({ x, delay, color, size, isCircle }: {
         ]),
       ]),
     ]).start();
-  }, []);
+  }, [delay, opacity, rotate, translateY]);
 
   const spin = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '540deg'] });
 
@@ -99,7 +99,7 @@ function LevelUpOverlay({
       }, 3000);
       return () => clearTimeout(t);
     }
-  }, [visible]);
+  }, [bgOpacity, onDone, scale, visible]);
 
   if (!visible) return null;
 
@@ -208,7 +208,7 @@ export default function HomeScreen() {
         }
       };
       loadUser();
-    }, [])
+    }, [router, t])
   );
 
   const handleLogout = async () => {
@@ -334,7 +334,9 @@ export default function HomeScreen() {
           style={styles.langToggle}
           onPress={() => setLang(lang === 'en' ? 'bg' : 'en')}
         >
-          <Text style={styles.langToggleText}>{lang === 'en' ? '🇧🇬 Български' : '🇬🇧 English'}</Text>
+          <Text style={styles.langToggleText}>
+            {lang === 'en' ? t('home_language_toggle_en') : t('home_language_toggle_bg')}
+          </Text>
         </TouchableOpacity>
 
         {/* DEV: test level-up animation — remove before release */}

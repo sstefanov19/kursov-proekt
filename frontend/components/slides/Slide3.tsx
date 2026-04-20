@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import Header from '../Header';
+import { useTranslation } from '../../i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function Slide3({ onNext, onSkip }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
@@ -19,7 +22,7 @@ export default function Slide3({ onNext, onSkip }: Props) {
         <View style={styles.graphicContainer}>
           <View style={styles.circleBg} />
           <View style={styles.yellowSquare}>
-            <Text style={styles.chestPlaceholder}>Chest Img</Text>
+            <Text style={styles.chestPlaceholder}>🎁</Text>
           </View>
           {/* Floating Badges */}
           <View style={[styles.badge, styles.badgeTopLeft]}>
@@ -35,16 +38,14 @@ export default function Slide3({ onNext, onSkip }: Props) {
           </View>
         </View>
 
-        <Text style={styles.title}>Win rewards as you{'\n'}learn</Text>
-        <Text style={styles.subtitle}>
-          Collect coins, unlock worlds, and level up your hero.
-        </Text>
+        <Text style={styles.title}>{t('onboarding_title3')}</Text>
+        <Text style={styles.subtitle}>{t('onboarding_sub3')}</Text>
 
         <View style={styles.cardsContainer}>
           <View style={styles.levelCard}>
             <View style={styles.levelHeader}>
-              <Text style={styles.levelLabel}>GROWTH LEVEL</Text>
-              <Text style={styles.levelValue}>Lv. 12</Text>
+              <Text style={styles.levelLabel}>{t('onboarding_slide3_level_label')}</Text>
+              <Text style={styles.levelValue}>{t('level_label')} 12</Text>
             </View>
             <View style={styles.progressBarBg}>
               <View style={styles.progressBarActive} />
@@ -56,19 +57,19 @@ export default function Slide3({ onNext, onSkip }: Props) {
               <View style={[styles.pillIcon, { backgroundColor: '#BBF7D0' }]}>
                 <Text>✨</Text>
               </View>
-              <Text style={styles.pillText}>FAST SOLVER</Text>
+              <Text style={styles.pillText}>{t('onboarding_slide3_badge_fast')}</Text>
             </View>
             <View style={styles.pillCard}>
               <View style={[styles.pillIcon, { backgroundColor: '#FEF08A' }]}>
                 <Text>🏆</Text>
               </View>
-              <Text style={styles.pillText}>GOLD STAR</Text>
+              <Text style={styles.pillText}>{t('onboarding_slide3_badge_gold')}</Text>
             </View>
           </View>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={onNext}>
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t('onboarding_next')}</Text>
         </TouchableOpacity>
 
         <View style={styles.dotsContainer}>
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   chestPlaceholder: {
     color: '#1E2B4D',
-    fontWeight: '800',
+    fontSize: 56,
   },
   badge: {
     position: 'absolute',
