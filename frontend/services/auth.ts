@@ -1,5 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import type { TranslationKeys } from '../i18n';
 
 const API_BASE = 'http://localhost:8080/api/v1/auth';
 const PLAYER_API = 'http://localhost:8080/api/v1/player';
@@ -8,9 +9,16 @@ const TOKEN_KEY = 'jwt_token';
 const USERNAME_KEY = 'username';
 
 type ApiErrorPayload = {
+  code?: string;
   status?: number;
   error?: string;
   message?: string;
+  fieldErrors?: Record<string, string>;
+};
+
+type ApiClientError = Error & {
+  status?: number;
+  code?: string;
   fieldErrors?: Record<string, string>;
 };
 
@@ -65,9 +73,84 @@ async function throwApiError(res: Response, fallback: string): Promise<never> {
   }
 
   const message = buildErrorMessage(payload, textBody || fallback);
-  const error = new Error(message) as Error & { status?: number };
+  const error = new Error(message) as ApiClientError;
+  error.code = payload?.code;
   error.status = payload?.status ?? res.status;
+  error.fieldErrors = payload?.fieldErrors;
   throw error;
+}
+
+function localizeValidationMessage(
+  rawMessage: string,
+  t: (key: TranslationKeys) => string,
+): string {
+  switch (rawMessage) {
+    case 'Email is required':
+      return t('error_email_required');
+    case 'Must be a valid email address':
+      return t('error_email_invalid');
+    case 'Username is required':
+      return t('error_username_required');
+    case 'Username must be between 3 and 30 characters':
+      return t('error_username_length');
+    case 'Password is required':
+      return t('error_password_required');
+    case 'Password must be at least 6 characters':
+      return t('error_password_length');
+    case 'Classroom name is required':
+      return t('error_classroom_name_required');
+    case 'Name must be between 2 and 50 characters':
+      return t('error_classroom_name_length');
+    case 'Classroom code is required':
+      return t('error_classroom_code_required');
+    case 'XP must be at least 1':
+      return t('error_xp_min');
+    default:
+      return rawMessage;
+  }
+}
+
+export function getLocalizedErrorMessage(
+  error: unknown,
+  t: (key: TranslationKeys) => string,
+  fallbackKey: TranslationKeys,
+): string {
+  const apiError = error as ApiClientError | undefined;
+  const rawMessage = apiError?.message;
+
+  if (!rawMessage || rawMessage === 'Failed to fetch' || rawMessage === 'Network request failed') {
+    return t(fallbackKey);
+  }
+
+  const fieldErrors = apiError?.fieldErrors ? Object.values(apiError.fieldErrors).filter(Boolean) : [];
+  if (fieldErrors.length > 0) {
+    return fieldErrors.map((message) => localizeValidationMessage(message, t)).join('\n');
+  }
+
+  switch (apiError?.code) {
+    case 'INVALID_CREDENTIALS':
+      return t('error_invalid_credentials');
+    case 'CLASSROOM_NOT_FOUND':
+      return t('error_classroom_not_found');
+    case 'USER_NOT_FOUND':
+      return t('error_user_not_found');
+    case 'PERK_REQUIREMENT_NOT_MET':
+      return t('error_perk_requirement_not_met');
+    case 'UNEXPECTED_SERVER_ERROR':
+      return t('error_server');
+    case 'DUPLICATE_RESOURCE':
+      if (rawMessage === 'Username already taken') return t('error_username_taken');
+      if (rawMessage === 'Email already taken') return t('error_email_taken');
+      return t('error_duplicate_resource');
+    case 'VALIDATION_ERROR':
+      return localizeValidationMessage(rawMessage, t);
+    default:
+      if (rawMessage === 'Username already taken') return t('error_username_taken');
+      if (rawMessage === 'Email already taken') return t('error_email_taken');
+      if (rawMessage === 'Invalid username or password') return t('error_invalid_credentials');
+      if (rawMessage === 'Classroom not found') return t('error_classroom_not_found');
+      return rawMessage;
+  }
 }
 
 export async function getToken(): Promise<string | null> {

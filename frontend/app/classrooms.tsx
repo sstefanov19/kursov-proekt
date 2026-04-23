@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import {
+  getLocalizedErrorMessage,
   fetchMyClassrooms,
   createClassroom,
   joinClassroom,
@@ -55,12 +56,7 @@ export default function ClassroomsScreen() {
         }
       }
     } catch (e: any) {
-      const message = e?.message;
-      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
-        setError(t('login_generic_error'));
-      } else {
-        setError(message);
-      }
+      setError(getLocalizedErrorMessage(e, t, 'login_generic_error'));
     }
   };
 
@@ -73,12 +69,7 @@ export default function ClassroomsScreen() {
       setShowJoin(false);
       load();
     } catch (e: any) {
-      const message = e?.message;
-      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
-        setError(t('classrooms_join_error'));
-      } else {
-        setError(message);
-      }
+      setError(getLocalizedErrorMessage(e, t, 'classrooms_join_error'));
     }
   };
 

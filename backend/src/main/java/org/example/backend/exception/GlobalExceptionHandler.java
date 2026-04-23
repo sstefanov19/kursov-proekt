@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
             UserNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+        return buildResponse("USER_NOT_FOUND", HttpStatus.NOT_FOUND, ex, request);
     }
 
     @ExceptionHandler(ClassroomNotFoundException.class)
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
             ClassroomNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+        return buildResponse("CLASSROOM_NOT_FOUND", HttpStatus.NOT_FOUND, ex, request);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, ex, request);
+        return buildResponse("INVALID_CREDENTIALS", HttpStatus.UNAUTHORIZED, ex, request);
     }
 
     @ExceptionHandler(PerkRequirementNotMetException.class)
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
             PerkRequirementNotMetException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.FORBIDDEN, ex, request);
+        return buildResponse("PERK_REQUIREMENT_NOT_MET", HttpStatus.FORBIDDEN, ex, request);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
             DuplicateResourceException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.CONFLICT, ex, request);
+        return buildResponse("DUPLICATE_RESOURCE", HttpStatus.CONFLICT, ex, request);
     }
 
     @ExceptionHandler({InvalidPerkException.class, IllegalArgumentException.class, ConstraintViolationException.class})
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
             RuntimeException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
+        return buildResponse("BAD_REQUEST", HttpStatus.BAD_REQUEST, ex, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -78,6 +78,7 @@ public class GlobalExceptionHandler {
         }
 
         ApiErrorResponse body = ApiErrorResponse.of(
+                "VALIDATION_ERROR",
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "Validation failed",
@@ -111,10 +112,15 @@ public class GlobalExceptionHandler {
                 message,
                 ex
         );
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, message, request.getRequestURI());
+        return buildResponse("UNEXPECTED_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, message, request.getRequestURI());
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, RuntimeException ex, HttpServletRequest request) {
+    private ResponseEntity<ApiErrorResponse> buildResponse(
+            String code,
+            HttpStatus status,
+            RuntimeException ex,
+            HttpServletRequest request
+    ) {
         String message = ex.getMessage() == null || ex.getMessage().isBlank()
                 ? status.getReasonPhrase()
                 : ex.getMessage();
@@ -127,11 +133,12 @@ public class GlobalExceptionHandler {
                 message
         );
 
-        return buildResponse(status, message, request.getRequestURI());
+        return buildResponse(code, status, message, request.getRequestURI());
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message, String path) {
+    private ResponseEntity<ApiErrorResponse> buildResponse(String code, HttpStatus status, String message, String path) {
         ApiErrorResponse body = ApiErrorResponse.of(
+                code,
                 status.value(),
                 status.getReasonPhrase(),
                 message,

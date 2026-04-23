@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { login, register } from '../services/auth';
+import { getLocalizedErrorMessage, login, register } from '../services/auth';
 import { useTranslation } from '../i18n';
 
 export default function LoginScreen() {
@@ -48,12 +48,7 @@ export default function LoginScreen() {
       }
       router.replace('/home');
     } catch (e: any) {
-      const message = e?.message;
-      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
-        setError(t('login_generic_error'));
-      } else {
-        setError(message);
-      }
+      setError(getLocalizedErrorMessage(e, t, 'login_generic_error'));
     } finally {
       setLoading(false);
     }
