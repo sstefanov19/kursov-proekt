@@ -128,13 +128,16 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.switchButton}
+            style={[
+              styles.switchButton,
+              isRegister ? styles.secondaryButton : styles.switchLinkButton,
+            ]}
             onPress={() => {
               setIsRegister(!isRegister);
               setError('');
             }}
           >
-            <Text style={styles.switchText}>
+            <Text style={[styles.switchText, isRegister && styles.secondaryButtonText]}>
               {isRegister ? t('login_switch_to_login') : t('login_switch_to_register')}
             </Text>
           </TouchableOpacity>
@@ -244,9 +247,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
+  switchLinkButton: {
+    paddingVertical: 8,
+  },
+  secondaryButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 30,
+    paddingVertical: 16,
+    marginTop: 4,
+  },
   switchText: {
     color: '#0B47D1',
     fontWeight: '700',
     fontSize: 14,
+  },
+  secondaryButtonText: {
+    color: '#1E2B4D',
+    fontSize: 15,
   },
 });
