@@ -49,10 +49,10 @@ export default function LoginScreen() {
       router.replace('/home');
     } catch (e: any) {
       const message = e?.message;
-      if (message === 'Login failed' || message === 'Registration failed' || message === 'Something went wrong.') {
+      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
         setError(t('login_generic_error'));
       } else {
-        setError(message || t('login_generic_error'));
+        setError(message);
       }
     } finally {
       setLoading(false);

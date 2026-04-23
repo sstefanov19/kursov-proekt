@@ -2,6 +2,8 @@ package org.example.backend.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,12 +17,14 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleUserNotFound(
             UserNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
     @ExceptionHandler(ClassroomNotFoundException.class)
@@ -28,7 +32,7 @@ public class GlobalExceptionHandler {
             ClassroomNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -36,7 +40,7 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex, request);
     }
 
     @ExceptionHandler(PerkRequirementNotMetException.class)
@@ -44,7 +48,7 @@ public class GlobalExceptionHandler {
             PerkRequirementNotMetException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.FORBIDDEN, ex, request);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
@@ -52,7 +56,7 @@ public class GlobalExceptionHandler {
             DuplicateResourceException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.CONFLICT, ex, request);
     }
 
     @ExceptionHandler({InvalidPerkException.class, IllegalArgumentException.class, ConstraintViolationException.class})
@@ -60,7 +64,7 @@ public class GlobalExceptionHandler {
             RuntimeException ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+        return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -81,6 +85,15 @@ public class GlobalExceptionHandler {
                 fieldErrors
         );
 
+        log.warn(
+                "Handled API error: status={}, method={}, path={}, message={}, fieldErrors={}",
+                HttpStatus.BAD_REQUEST.value(),
+                request.getMethod(),
+                request.getRequestURI(),
+                "Validation failed",
+                fieldErrors
+        );
+
         return ResponseEntity.badRequest().body(body);
     }
 
@@ -89,7 +102,32 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", request.getRequestURI());
+        String message = "Unexpected server error";
+        log.error(
+                "Unhandled API error: status={}, method={}, path={}, message={}",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                request.getMethod(),
+                request.getRequestURI(),
+                message,
+                ex
+        );
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, message, request.getRequestURI());
+    }
+
+    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, RuntimeException ex, HttpServletRequest request) {
+        String message = ex.getMessage() == null || ex.getMessage().isBlank()
+                ? status.getReasonPhrase()
+                : ex.getMessage();
+
+        log.warn(
+                "Handled API error: status={}, method={}, path={}, message={}",
+                status.value(),
+                request.getMethod(),
+                request.getRequestURI(),
+                message
+        );
+
+        return buildResponse(status, message, request.getRequestURI());
     }
 
     private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message, String path) {

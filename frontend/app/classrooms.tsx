@@ -41,16 +41,25 @@ export default function ClassroomsScreen() {
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setError('');
-    const result = await createClassroom(newName.trim());
-    if (result) {
-      setNewName('');
-      setShowCreate(false);
-      load();
-      const msg = t('classrooms_created_message').replace('{code}', result.code);
-      if (Platform.OS === 'web') {
-        window.alert(msg);
+    try {
+      const result = await createClassroom(newName.trim());
+      if (result) {
+        setNewName('');
+        setShowCreate(false);
+        load();
+        const msg = t('classrooms_created_message').replace('{code}', result.code);
+        if (Platform.OS === 'web') {
+          window.alert(msg);
+        } else {
+          Alert.alert(t('classrooms_created_title'), msg);
+        }
+      }
+    } catch (e: any) {
+      const message = e?.message;
+      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
+        setError(t('login_generic_error'));
       } else {
-        Alert.alert(t('classrooms_created_title'), msg);
+        setError(message);
       }
     }
   };
@@ -65,10 +74,10 @@ export default function ClassroomsScreen() {
       load();
     } catch (e: any) {
       const message = e?.message;
-      if (message === 'Failed to join classroom' || message === 'Could not join classroom') {
+      if (!message || message === 'Failed to fetch' || message === 'Network request failed') {
         setError(t('classrooms_join_error'));
       } else {
-        setError(message || t('classrooms_join_error'));
+        setError(message);
       }
     }
   };
@@ -131,6 +140,7 @@ export default function ClassroomsScreen() {
               value={newName}
               onChangeText={setNewName}
             />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.submitBtn} onPress={handleCreate}>
               <Text style={styles.submitBtnText}>{t('classrooms_create')}</Text>
             </TouchableOpacity>

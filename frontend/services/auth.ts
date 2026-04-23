@@ -7,6 +7,13 @@ const CLASSROOM_API = 'http://localhost:8080/api/v1/classrooms';
 const TOKEN_KEY = 'jwt_token';
 const USERNAME_KEY = 'username';
 
+type ApiErrorPayload = {
+  status?: number;
+  error?: string;
+  message?: string;
+  fieldErrors?: Record<string, string>;
+};
+
 // For web, fall back to localStorage since SecureStore is not available
 async function setItem(key: string, value: string) {
   if (Platform.OS === 'web') {
@@ -29,6 +36,38 @@ async function removeItem(key: string) {
   } else {
     await SecureStore.deleteItemAsync(key);
   }
+}
+
+function buildErrorMessage(payload: ApiErrorPayload | null, fallback: string): string {
+  if (!payload) return fallback;
+
+  const fieldErrors = payload.fieldErrors ? Object.values(payload.fieldErrors).filter(Boolean) : [];
+  if (fieldErrors.length > 0) {
+    return fieldErrors.join('\n');
+  }
+
+  return payload.message || fallback;
+}
+
+async function throwApiError(res: Response, fallback: string): Promise<never> {
+  let payload: ApiErrorPayload | null = null;
+  let textBody = '';
+
+  try {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      payload = await res.json();
+    } else {
+      textBody = (await res.text()).trim();
+    }
+  } catch {
+    // Ignore parse failures and fall back to the provided message.
+  }
+
+  const message = buildErrorMessage(payload, textBody || fallback);
+  const error = new Error(message) as Error & { status?: number };
+  error.status = payload?.status ?? res.status;
+  throw error;
 }
 
 export async function getToken(): Promise<string | null> {
@@ -214,8 +253,7 @@ export async function login(username: string, password: string): Promise<string>
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Login failed');
+    await throwApiError(res, 'Login failed');
   }
 
   const data = await res.json();
@@ -232,8 +270,7 @@ export async function register(email: string, username: string, password: string
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Registration failed');
+    await throwApiError(res, 'Registration failed');
   }
 
   const data = await res.json();
@@ -268,7 +305,10 @@ export async function createClassroom(name: string): Promise<ClassroomInfo | nul
       body: JSON.stringify({ name }),
     });
     if (res.ok) return await res.json();
-  } catch { /* offline */ }
+    await throwApiError(res, 'Failed to create classroom');
+  } catch (error) {
+    if (error instanceof Error) throw error;
+  }
   return null;
 }
 
@@ -279,8 +319,7 @@ export async function joinClassroom(code: string): Promise<ClassroomInfo | null>
     body: JSON.stringify({ code }),
   });
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Failed to join classroom');
+    await throwApiError(res, 'Failed to join classroom');
   }
   return await res.json();
 }
