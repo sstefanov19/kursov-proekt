@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import {
+  getLocalizedErrorMessage,
   fetchMyClassrooms,
   createClassroom,
   joinClassroom,
@@ -41,17 +42,21 @@ export default function ClassroomsScreen() {
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setError('');
-    const result = await createClassroom(newName.trim());
-    if (result) {
-      setNewName('');
-      setShowCreate(false);
-      load();
-      const msg = t('classrooms_created_message').replace('{code}', result.code);
-      if (Platform.OS === 'web') {
-        window.alert(msg);
-      } else {
-        Alert.alert(t('classrooms_created_title'), msg);
+    try {
+      const result = await createClassroom(newName.trim());
+      if (result) {
+        setNewName('');
+        setShowCreate(false);
+        load();
+        const msg = t('classrooms_created_message').replace('{code}', result.code);
+        if (Platform.OS === 'web') {
+          window.alert(msg);
+        } else {
+          Alert.alert(t('classrooms_created_title'), msg);
+        }
       }
+    } catch (e: any) {
+      setError(getLocalizedErrorMessage(e, t, 'login_generic_error'));
     }
   };
 
@@ -64,12 +69,7 @@ export default function ClassroomsScreen() {
       setShowJoin(false);
       load();
     } catch (e: any) {
-      const message = e?.message;
-      if (message === 'Failed to join classroom' || message === 'Could not join classroom') {
-        setError(t('classrooms_join_error'));
-      } else {
-        setError(message || t('classrooms_join_error'));
-      }
+      setError(getLocalizedErrorMessage(e, t, 'classrooms_join_error'));
     }
   };
 
@@ -131,6 +131,7 @@ export default function ClassroomsScreen() {
               value={newName}
               onChangeText={setNewName}
             />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.submitBtn} onPress={handleCreate}>
               <Text style={styles.submitBtnText}>{t('classrooms_create')}</Text>
             </TouchableOpacity>

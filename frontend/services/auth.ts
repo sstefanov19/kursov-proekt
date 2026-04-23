@@ -1,11 +1,26 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import type { TranslationKeys } from '../i18n';
 
 const API_BASE = 'http://localhost:8080/api/v1/auth';
 const PLAYER_API = 'http://localhost:8080/api/v1/player';
 const CLASSROOM_API = 'http://localhost:8080/api/v1/classrooms';
 const TOKEN_KEY = 'jwt_token';
 const USERNAME_KEY = 'username';
+
+type ApiErrorPayload = {
+  code?: string;
+  status?: number;
+  error?: string;
+  message?: string;
+  fieldErrors?: Record<string, string>;
+};
+
+type ApiClientError = Error & {
+  status?: number;
+  code?: string;
+  fieldErrors?: Record<string, string>;
+};
 
 // For web, fall back to localStorage since SecureStore is not available
 async function setItem(key: string, value: string) {
@@ -31,6 +46,113 @@ async function removeItem(key: string) {
   }
 }
 
+function buildErrorMessage(payload: ApiErrorPayload | null, fallback: string): string {
+  if (!payload) return fallback;
+
+  const fieldErrors = payload.fieldErrors ? Object.values(payload.fieldErrors).filter(Boolean) : [];
+  if (fieldErrors.length > 0) {
+    return fieldErrors.join('\n');
+  }
+
+  return payload.message || fallback;
+}
+
+async function throwApiError(res: Response, fallback: string): Promise<never> {
+  let payload: ApiErrorPayload | null = null;
+  let textBody = '';
+
+  try {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      payload = await res.json();
+    } else {
+      textBody = (await res.text()).trim();
+    }
+  } catch {
+    // Ignore parse failures and fall back to the provided message.
+  }
+
+  const message = buildErrorMessage(payload, textBody || fallback);
+  const error = new Error(message) as ApiClientError;
+  error.code = payload?.code;
+  error.status = payload?.status ?? res.status;
+  error.fieldErrors = payload?.fieldErrors;
+  throw error;
+}
+
+function localizeValidationMessage(
+  rawMessage: string,
+  t: (key: TranslationKeys) => string,
+): string {
+  switch (rawMessage) {
+    case 'Email is required':
+      return t('error_email_required');
+    case 'Must be a valid email address':
+      return t('error_email_invalid');
+    case 'Username is required':
+      return t('error_username_required');
+    case 'Username must be between 3 and 30 characters':
+      return t('error_username_length');
+    case 'Password is required':
+      return t('error_password_required');
+    case 'Password must be at least 6 characters':
+      return t('error_password_length');
+    case 'Classroom name is required':
+      return t('error_classroom_name_required');
+    case 'Name must be between 2 and 50 characters':
+      return t('error_classroom_name_length');
+    case 'Classroom code is required':
+      return t('error_classroom_code_required');
+    case 'XP must be at least 1':
+      return t('error_xp_min');
+    default:
+      return rawMessage;
+  }
+}
+
+export function getLocalizedErrorMessage(
+  error: unknown,
+  t: (key: TranslationKeys) => string,
+  fallbackKey: TranslationKeys,
+): string {
+  const apiError = error as ApiClientError | undefined;
+  const rawMessage = apiError?.message;
+
+  if (!rawMessage || rawMessage === 'Failed to fetch' || rawMessage === 'Network request failed') {
+    return t(fallbackKey);
+  }
+
+  const fieldErrors = apiError?.fieldErrors ? Object.values(apiError.fieldErrors).filter(Boolean) : [];
+  if (fieldErrors.length > 0) {
+    return fieldErrors.map((message) => localizeValidationMessage(message, t)).join('\n');
+  }
+
+  switch (apiError?.code) {
+    case 'INVALID_CREDENTIALS':
+      return t('error_invalid_credentials');
+    case 'CLASSROOM_NOT_FOUND':
+      return t('error_classroom_not_found');
+    case 'USER_NOT_FOUND':
+      return t('error_user_not_found');
+    case 'PERK_REQUIREMENT_NOT_MET':
+      return t('error_perk_requirement_not_met');
+    case 'UNEXPECTED_SERVER_ERROR':
+      return t('error_server');
+    case 'DUPLICATE_RESOURCE':
+      if (rawMessage === 'Username already taken') return t('error_username_taken');
+      if (rawMessage === 'Email already taken') return t('error_email_taken');
+      return t('error_duplicate_resource');
+    case 'VALIDATION_ERROR':
+      return localizeValidationMessage(rawMessage, t);
+    default:
+      if (rawMessage === 'Username already taken') return t('error_username_taken');
+      if (rawMessage === 'Email already taken') return t('error_email_taken');
+      if (rawMessage === 'Invalid username or password') return t('error_invalid_credentials');
+      if (rawMessage === 'Classroom not found') return t('error_classroom_not_found');
+      return rawMessage;
+  }
+}
+
 export async function getToken(): Promise<string | null> {
   return getItem(TOKEN_KEY);
 }
@@ -46,7 +168,19 @@ export async function getXp(): Promise<number> {
   return val ? parseInt(val, 10) : 0;
 }
 
-export async function addXp(amount: number): Promise<number> {
+function calculateLevelFromXp(xp: number): number {
+  let level = 1;
+  let remaining = xp;
+
+  while (remaining >= 100 * Math.pow(2, Math.floor((level - 1) / 5))) {
+    remaining -= 100 * Math.pow(2, Math.floor((level - 1) / 5));
+    level++;
+  }
+
+  return level;
+}
+
+export async function addXp(amount: number): Promise<PlayerStats> {
   // Update locally first
   const current = await getXp();
   const next = current + amount;
@@ -65,16 +199,23 @@ export async function addXp(amount: number): Promise<number> {
         body: JSON.stringify({ xp: amount }),
       });
       if (res.ok) {
-        const data = await res.json();
+        const data: PlayerStats = await res.json();
         // Sync local XP with backend truth
         await setItem(XP_KEY, String(data.xp));
-        return data.xp;
+        return data;
       }
     }
   } catch {
     // Offline — local XP is still saved
   }
-  return next;
+
+  return {
+    username: (await getUsername()) || '',
+    xp: next,
+    level: calculateLevelFromXp(next),
+    rank: 0,
+    activePerk: null,
+  };
 }
 
 export interface PlayerStats {
@@ -214,8 +355,7 @@ export async function login(username: string, password: string): Promise<string>
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Login failed');
+    await throwApiError(res, 'Login failed');
   }
 
   const data = await res.json();
@@ -232,8 +372,7 @@ export async function register(email: string, username: string, password: string
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Registration failed');
+    await throwApiError(res, 'Registration failed');
   }
 
   const data = await res.json();
@@ -268,7 +407,10 @@ export async function createClassroom(name: string): Promise<ClassroomInfo | nul
       body: JSON.stringify({ name }),
     });
     if (res.ok) return await res.json();
-  } catch { /* offline */ }
+    await throwApiError(res, 'Failed to create classroom');
+  } catch (error) {
+    if (error instanceof Error) throw error;
+  }
   return null;
 }
 
@@ -279,8 +421,7 @@ export async function joinClassroom(code: string): Promise<ClassroomInfo | null>
     body: JSON.stringify({ code }),
   });
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || 'Failed to join classroom');
+    await throwApiError(res, 'Failed to join classroom');
   }
   return await res.json();
 }
