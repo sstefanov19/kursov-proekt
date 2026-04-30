@@ -89,9 +89,9 @@ export default {
   home_easy: 'Easy',
   home_medium: 'Medium',
   home_hard: 'Hard',
-  home_easy_hint: '10 questions · Addition & subtraction',
-  home_medium_hint: '10 questions · Add, subtract & multiply',
-  home_hard_hint: '5 questions · All operations · Big numbers',
+  home_easy_hint: '10 questions · 20s each · Addition & subtraction',
+  home_medium_hint: '10 questions · 15s each · Add, subtract & multiply',
+  home_hard_hint: '5 questions · 12s each · All operations · Big numbers',
   home_play_now: 'PLAY NOW',
   home_logout: 'Log Out',
   home_default_username: 'Player',
@@ -122,6 +122,7 @@ export default {
 
   // Game
   game_score: 'SCORE',
+  game_time_left: 'TIME',
   game_quit: 'Quit Game',
   game_quit_title: 'Quit Game',
   game_quit_message: 'Are you sure you want to quit? Your XP will be saved.',
