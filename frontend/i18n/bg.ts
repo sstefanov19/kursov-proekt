@@ -89,9 +89,9 @@ export default {
   home_easy: 'Лесно',
   home_medium: 'Средно',
   home_hard: 'Трудно',
-  home_easy_hint: '10 въпроса · Събиране и изваждане',
-  home_medium_hint: '10 въпроса · Събиране, изваждане и умножение',
-  home_hard_hint: '5 въпроса · Всички операции · Големи числа',
+  home_easy_hint: '10 въпроса · 20 сек. на въпрос · Събиране и изваждане',
+  home_medium_hint: '10 въпроса · 15 сек. на въпрос · Събиране, изваждане и умножение',
+  home_hard_hint: '5 въпроса · 12 сек. на въпрос · Всички операции · Големи числа',
   home_play_now: 'ИГРАЙ',
   home_logout: 'Изход',
   home_default_username: 'Играч',
@@ -122,6 +122,7 @@ export default {
 
   // Game
   game_score: 'ТОЧКИ',
+  game_time_left: 'ВРЕМЕ',
   game_quit: 'Напусни играта',
   game_quit_title: 'Напускане',
   game_quit_message: 'Сигурни ли сте, че искате да напуснете? XP-то ви ще бъде запазено.',
