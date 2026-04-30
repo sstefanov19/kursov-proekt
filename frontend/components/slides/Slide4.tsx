@@ -21,60 +21,55 @@ export default function Slide4({ onNext, onSkip }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} showSkip={false} />
-      
-      <View style={styles.headerDots}>
-        <View style={styles.dot} />
-        <View style={styles.dot} />
-        <View style={styles.dot} />
-        <View style={styles.activeDotLine} />
-      </View>
-      <Text style={styles.stepText}>{t('onboarding_step_4')}</Text>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{t('onboarding_title4')}</Text>
-          <Text style={styles.subtitle}>{t('onboarding_sub4')}</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>{t('onboarding_title4')}</Text>
+        <Text style={styles.subtitle}>{t('onboarding_sub4')}</Text>
 
-          <Text style={styles.levelLabel}>{t('onboarding_slide4_level_label')}</Text>
-          <View style={styles.levelCard}>
-            {['Easy', 'Medium', 'Hard'].map((lvl) => (
-              <TouchableOpacity 
-                key={lvl}
-                style={selectedLevel === lvl ? styles.levelBtnActive : styles.levelBtnInactive}
-                onPress={() => setSelectedLevel(lvl)}
-              >
-                <Text style={selectedLevel === lvl ? styles.levelBtnTextActive : styles.levelBtnTextInactive}>
-                  {levelLabel(lvl)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <View style={styles.infoBadge}>
-            <View style={styles.iconBox}>
-              <Text style={styles.icon}>🛡️</Text>
-            </View>
-            <View style={styles.infoTextContainer}>
-              <Text style={styles.infoTitle}>{t('onboarding_slide4_info_title')}</Text>
-              <Text style={styles.infoDesc}>{t('onboarding_slide4_info_desc')}</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.button} onPress={() => onNext(selectedLevel)}>
-            <Text style={styles.buttonText}>{t('onboarding_play')} →</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.linkButton} onPress={() => onNext(selectedLevel)}>
-            <Text style={styles.linkButtonText}>{t('onboarding_slide4_secondary')}</Text>
-          </TouchableOpacity>
+        <Text style={styles.levelLabel}>{t('onboarding_slide4_level_label')}</Text>
+        <View style={styles.levelCard}>
+          {['Easy', 'Medium', 'Hard'].map((lvl) => (
+            <TouchableOpacity
+              key={lvl}
+              style={selectedLevel === lvl ? styles.levelBtnActive : styles.levelBtnInactive}
+              onPress={() => setSelectedLevel(lvl)}
+            >
+              <Text style={selectedLevel === lvl ? styles.levelBtnTextActive : styles.levelBtnTextInactive}>
+                {levelLabel(lvl)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        <View style={styles.footerGraphicContainer}>
-          <View style={styles.yellowCircle}>
-            <Text style={styles.familyIcon}>👨‍👩‍👦</Text>
+        <View style={styles.infoBadge}>
+          <View style={styles.infoIcon}>
+            <Text style={styles.infoIconEmoji}>🛡️</Text>
+          </View>
+          <View style={styles.infoTextBlock}>
+            <Text style={styles.infoTitle}>{t('onboarding_slide4_info_title')}</Text>
+            <Text style={styles.infoDesc}>{t('onboarding_slide4_info_desc')}</Text>
           </View>
         </View>
       </ScrollView>
+
+      <View style={styles.actionZone}>
+        <TouchableOpacity style={styles.button} onPress={() => onNext(selectedLevel)}>
+          <Text style={styles.buttonText}>{t('onboarding_play')} →</Text>
+        </TouchableOpacity>
+        <View style={styles.dotsRow}>
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+          <View style={[styles.dot, styles.activeDot]} />
+        </View>
+        <TouchableOpacity onPress={() => onNext(selectedLevel)}>
+          <Text style={styles.linkText}>{t('onboarding_slide4_secondary')}</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -84,96 +79,60 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F7F8FD',
   },
-  headerDots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -10,
-    marginBottom: 8,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#D1D5DB',
-    marginHorizontal: 4,
-  },
-  activeDotLine: {
-    width: 24,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#0B47D1',
-    marginHorizontal: 4,
-  },
-  stepText: {
-    textAlign: 'center',
-    color: '#0B47D1',
-    fontWeight: '800',
-    fontSize: 12,
-    letterSpacing: 1,
-    marginBottom: 20,
+  scroll: {
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 60,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 40,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 5,
+    paddingHorizontal: 28,
+    paddingTop: 8,
+    paddingBottom: 16,
+    gap: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '900',
     color: '#1E2B4D',
     textAlign: 'center',
-    marginBottom: 12,
+    lineHeight: 38,
   },
   subtitle: {
     fontSize: 16,
-    color: '#475569',
+    color: '#64748B',
     textAlign: 'center',
-    marginBottom: 30,
-    lineHeight: 24,
+    lineHeight: 26,
   },
   levelLabel: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: '700',
     color: '#1E2B4D',
-    marginBottom: 12,
   },
   levelCard: {
     backgroundColor: '#EEF2FF',
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 8,
-    marginBottom: 24,
+    gap: 4,
   },
   levelBtnInactive: {
     paddingVertical: 14,
     alignItems: 'center',
+    borderRadius: 14,
   },
   levelBtnTextInactive: {
     color: '#64748B',
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 16,
   },
   levelBtnActive: {
     backgroundColor: '#0B47D1',
-    borderRadius: 20,
+    borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
     shadowColor: '#0B47D1',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 4,
-    marginVertical: 4,
   },
   levelBtnTextActive: {
     color: '#FFFFFF',
@@ -182,78 +141,78 @@ const styles = StyleSheet.create({
   },
   infoBadge: {
     flexDirection: 'row',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 16,
     alignItems: 'center',
-    marginBottom: 30,
+    gap: 14,
   },
-  iconBox: {
-    width: 40,
-    height: 40,
+  infoIcon: {
+    width: 44,
+    height: 44,
     backgroundColor: '#BBF7D0',
-    borderRadius: 20,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  icon: {
-    fontSize: 20,
+  infoIconEmoji: {
+    fontSize: 22,
   },
-  infoTextContainer: {
+  infoTextBlock: {
     flex: 1,
+    gap: 3,
   },
   infoTitle: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#1E2B4D',
-    marginBottom: 4,
   },
   infoDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#64748B',
-    lineHeight: 18,
+    lineHeight: 20,
+  },
+  actionZone: {
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+    alignItems: 'center',
+    gap: 16,
   },
   button: {
     backgroundColor: '#2B76E5',
     width: '100%',
-    paddingVertical: 18,
+    paddingVertical: 17,
     borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#2B76E5',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
     elevation: 8,
-    marginBottom: 16,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
   },
-  linkButton: {
-    paddingVertical: 12,
+  dotsRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
-  linkButtonText: {
-    color: '#0B47D1',
-    fontWeight: '700',
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D1D5DB',
+  },
+  activeDot: {
+    width: 24,
+    backgroundColor: '#0B47D1',
+  },
+  linkText: {
     fontSize: 14,
-  },
-  footerGraphicContainer: {
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  yellowCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FDE047',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  familyIcon: {
-    fontSize: 40,
+    color: '#0B47D1',
+    fontWeight: '600',
   },
 });

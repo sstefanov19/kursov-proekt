@@ -168,7 +168,19 @@ export async function getXp(): Promise<number> {
   return val ? parseInt(val, 10) : 0;
 }
 
-export async function addXp(amount: number): Promise<number> {
+function calculateLevelFromXp(xp: number): number {
+  let level = 1;
+  let remaining = xp;
+
+  while (remaining >= 100 * Math.pow(2, Math.floor((level - 1) / 5))) {
+    remaining -= 100 * Math.pow(2, Math.floor((level - 1) / 5));
+    level++;
+  }
+
+  return level;
+}
+
+export async function addXp(amount: number): Promise<PlayerStats> {
   // Update locally first
   const current = await getXp();
   const next = current + amount;
@@ -187,16 +199,23 @@ export async function addXp(amount: number): Promise<number> {
         body: JSON.stringify({ xp: amount }),
       });
       if (res.ok) {
-        const data = await res.json();
+        const data: PlayerStats = await res.json();
         // Sync local XP with backend truth
         await setItem(XP_KEY, String(data.xp));
-        return data.xp;
+        return data;
       }
     }
   } catch {
     // Offline — local XP is still saved
   }
-  return next;
+
+  return {
+    username: (await getUsername()) || '',
+    xp: next,
+    level: calculateLevelFromXp(next),
+    rank: 0,
+    activePerk: null,
+  };
 }
 
 export interface PlayerStats {

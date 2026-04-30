@@ -4,6 +4,7 @@ import Header from '../Header';
 import { useTranslation } from '../../i18n';
 
 const { width } = Dimensions.get('window');
+const STAGE_SIZE = Math.min(width * 0.68, 260);
 
 interface Props {
   onNext: () => void;
@@ -16,34 +17,34 @@ export default function Slide1({ onNext, onSkip }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
-      
-      {/* Character Graphic */}
-      <View style={styles.graphicContainer}>
-        <Image
-          source={require('../../public/character.png')}
-          style={styles.characterImage}
-          resizeMode="contain"
-        />
+
+      <View style={styles.illustrationZone}>
+        <View style={styles.stage}>
+          <Image
+            source={require('../../public/character.png')}
+            style={styles.characterImage}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
-      <View style={styles.contentContainer}>
+      <View style={styles.contentZone}>
         <Text style={styles.title}>{t('onboarding_title1')}</Text>
         <Text style={styles.subtitle}>{t('onboarding_sub1')}</Text>
+      </View>
 
+      <View style={styles.actionZone}>
         <TouchableOpacity style={styles.button} onPress={onNext}>
           <Text style={styles.buttonText}>{t('onboarding_slide1_cta')} →</Text>
         </TouchableOpacity>
-
-        <View style={styles.dotsContainer}>
+        <View style={styles.dotsRow}>
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
           <View style={styles.dot} />
         </View>
-        
-        <TouchableOpacity style={styles.skipContainer} onPress={onSkip}>
-          <Text style={styles.skipForNow}>{t('onboarding_skip_for_now')}</Text>
-          <Text style={styles.stepCount}>1/4</Text>
+        <TouchableOpacity onPress={onSkip}>
+          <Text style={styles.skipText}>{t('onboarding_skip_for_now')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -53,86 +54,86 @@ export default function Slide1({ onNext, onSkip }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#F7F8FD',
   },
-  graphicContainer: {
+  illustrationZone: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
-    position: 'relative',
+  },
+  stage: {
+    width: STAGE_SIZE,
+    height: STAGE_SIZE,
+    borderRadius: STAGE_SIZE / 2,
+    backgroundColor: '#DBEAFE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   characterImage: {
-    width: width * 0.8,
-    height: width * 0.8,
+    width: STAGE_SIZE,
+    height: STAGE_SIZE,
   },
-  contentContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
+  contentZone: {
+    paddingHorizontal: 28,
+    paddingBottom: 24,
     alignItems: 'center',
+    gap: 12,
   },
   title: {
-    fontSize: 36,
+    fontSize: 30,
     fontWeight: '900',
     color: '#1E2B4D',
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 42,
+    lineHeight: 38,
   },
   subtitle: {
     fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 32,
+    lineHeight: 26,
+  },
+  actionZone: {
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+    alignItems: 'center',
+    gap: 16,
   },
   button: {
     backgroundColor: '#2B76E5',
     width: '100%',
-    paddingVertical: 18,
+    paddingVertical: 17,
     borderRadius: 30,
     alignItems: 'center',
-    marginBottom: 24,
     shadowColor: '#2B76E5',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
     elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
   },
-  dotsContainer: {
+  dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
+    gap: 6,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#D1D5DB',
-    marginHorizontal: 4,
   },
   activeDot: {
     width: 24,
     backgroundColor: '#0B47D1',
   },
-  skipContainer: {
-    alignItems: 'center',
-  },
-  skipForNow: {
-    color: '#475569',
+  skipText: {
     fontSize: 14,
+    color: '#64748B',
     fontWeight: '600',
-    marginBottom: 4,
-  },
-  stepCount: {
-    color: '#0B47D1',
-    fontSize: 14,
-    fontWeight: '700',
   },
 });

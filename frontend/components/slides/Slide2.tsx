@@ -1,14 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../Header';
 import { useTranslation } from '../../i18n';
-
-const { width } = Dimensions.get('window');
 
 interface Props {
   onNext: () => void;
   onSkip: () => void;
 }
+
+const FEATURES = [
+  { emoji: '❓', bg: '#E0E7FF', labelKey: 'onboarding_slide2_card1' },
+  { emoji: '🗡️', bg: '#FEE2E2', labelKey: 'onboarding_slide2_card2' },
+  { emoji: '🏅', bg: '#FEF3C7', labelKey: 'onboarding_slide2_card3' },
+];
 
 export default function Slide2({ onNext, onSkip }: Props) {
   const { t } = useTranslation();
@@ -17,67 +21,52 @@ export default function Slide2({ onNext, onSkip }: Props) {
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
 
-      <View style={styles.contentContainer}>
-        {/* Graphic Placeholder */}
-        <View style={styles.graphicContainer}>
-          <View style={styles.phoneMockup}>
-            <View style={styles.phoneTop}>
-              <Text style={styles.castleIcon}>🏰</Text>
-            </View>
-            <View style={styles.phoneBottom}>
-              <View style={styles.mathBubble}>
-                <Text style={styles.mathText}>12 + 8 = ?</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Illustration stage */}
+        <View style={styles.stage}>
+          <View style={styles.chipsRow}>
+            {FEATURES.map((f) => (
+              <View key={f.emoji} style={[styles.chip, { backgroundColor: f.bg }]}>
+                <Text style={styles.chipEmoji}>{f.emoji}</Text>
               </View>
-              <View style={styles.answersRow}>
-                <View style={styles.answerBtn} />
-                <View style={styles.answerBtn} />
-              </View>
-            </View>
+            ))}
           </View>
-          <View style={styles.floatingOpBadge}>
-            <Text style={styles.opText}>÷</Text>
-          </View>
-          <View style={[styles.floatingOpBadge, styles.floatingOpBadge2]}>
-            <Text style={styles.opText}>+</Text>
+          <View style={styles.mathBubble}>
+            <Text style={styles.mathText}>12 + 8 = ?</Text>
           </View>
         </View>
 
+        {/* Text content */}
         <Text style={styles.title}>{t('onboarding_title2')}</Text>
         <Text style={styles.subtitle}>{t('onboarding_sub2')}</Text>
 
-        <View style={styles.stepContainer}>
-          <View style={styles.stepBarBg}>
-            <View style={styles.stepBarActive} />
-          </View>
-          <Text style={styles.stepText}>{t('onboarding_step_2')}</Text>
+        {/* Feature list */}
+        <View style={styles.featureList}>
+          {FEATURES.map((f) => (
+            <View key={f.emoji} style={styles.featureRow}>
+              <View style={[styles.featureIcon, { backgroundColor: f.bg }]}>
+                <Text style={styles.featureEmoji}>{f.emoji}</Text>
+              </View>
+              <Text style={styles.featureText}>{t(f.labelKey as Parameters<typeof t>[0])}</Text>
+            </View>
+          ))}
         </View>
+      </ScrollView>
 
-        <View style={styles.cardsContainer}>
-          <View style={styles.card}>
-            <View style={[styles.iconBox, { backgroundColor: '#E0E7FF' }]}>
-              <Text style={styles.icon}>❓</Text>
-            </View>
-            <Text style={styles.cardText}>{t('onboarding_slide2_card1')}</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={[styles.iconBox, { backgroundColor: '#FEE2E2' }]}>
-              <Text style={styles.icon}>⚔️</Text>
-            </View>
-            <Text style={styles.cardText}>{t('onboarding_slide2_card2')}</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={[styles.iconBox, { backgroundColor: '#FEF3C7' }]}>
-              <Text style={styles.icon}>🏅</Text>
-            </View>
-            <Text style={styles.cardText}>{t('onboarding_slide2_card3')}</Text>
-          </View>
-        </View>
-
+      <View style={styles.actionZone}>
         <TouchableOpacity style={styles.button} onPress={onNext}>
           <Text style={styles.buttonText}>{t('onboarding_next')}</Text>
         </TouchableOpacity>
+        <View style={styles.dotsRow}>
+          <View style={styles.dot} />
+          <View style={[styles.dot, styles.activeDot]} />
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -86,176 +75,135 @@ export default function Slide2({ onNext, onSkip }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#F7F8FD',
   },
-  contentContainer: {
+  scroll: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 24,
   },
-  graphicContainer: {
+  scrollContent: {
+    paddingHorizontal: 28,
+    paddingTop: 8,
+    paddingBottom: 16,
+    gap: 20,
+  },
+  stage: {
+    width: '100%',
+    backgroundColor: '#EEF2FF',
+    borderRadius: 32,
+    paddingVertical: 28,
     alignItems: 'center',
-    marginVertical: 20,
-    position: 'relative',
-    height: 220,
+    gap: 16,
   },
-  phoneMockup: {
-    width: 140,
-    height: 220,
-    backgroundColor: '#1E2B4D',
-    borderRadius: 30,
-    borderWidth: 6,
-    borderColor: '#1E2B4D',
-    overflow: 'hidden',
+  chipsRow: {
+    flexDirection: 'row',
+    gap: 16,
   },
-  phoneTop: {
-    flex: 1,
-    backgroundColor: '#0B47D1',
+  chip: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  castleIcon: {
-    fontSize: 24,
-  },
-  phoneBottom: {
-    flex: 1.5,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    paddingTop: 16,
+  chipEmoji: {
+    fontSize: 32,
   },
   mathBubble: {
-    backgroundColor: '#E0E7FF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#0B47D1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   mathText: {
-    color: '#1E2B4D',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  answersRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  answerBtn: {
-    width: 40,
-    height: 20,
-    backgroundColor: '#FACC15',
-    borderRadius: 10,
-  },
-  floatingOpBadge: {
-    position: 'absolute',
-    bottom: 20,
-    left: width / 2 - 90,
-    width: 32,
-    height: 32,
-    backgroundColor: '#FACC15',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#FACC15',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  floatingOpBadge2: {
-    top: 0,
-    right: width / 2 - 90,
-    left: undefined,
-    backgroundColor: '#4ADE80',
-    shadowColor: '#4ADE80',
-  },
-  opText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     color: '#1E2B4D',
+    letterSpacing: 1,
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '900',
     color: '#1E2B4D',
     textAlign: 'center',
-    marginBottom: 12,
     lineHeight: 38,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 12,
+    lineHeight: 26,
+    marginTop: -8,
   },
-  stepContainer: {
+  featureList: {
+    gap: 8,
+  },
+  featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    gap: 14,
   },
-  stepBarBg: {
-    width: 40,
-    height: 8,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    marginRight: 8,
-    overflow: 'hidden',
-  },
-  stepBarActive: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#22C55E',
-  },
-  stepText: {
-    color: '#64748B',
-    fontWeight: '700',
-    fontSize: 12,
-    letterSpacing: 1,
-  },
-  cardsContainer: {
-    flex: 1,
-    gap: 12,
-    marginBottom: 24,
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
-    padding: 16,
-    borderRadius: 24,
-  },
-  iconBox: {
+  featureIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  icon: {
-    fontSize: 18,
+  featureEmoji: {
+    fontSize: 20,
   },
-  cardText: {
+  featureText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#1E2B4D',
     flex: 1,
+    lineHeight: 20,
+  },
+  actionZone: {
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+    paddingTop: 8,
+    alignItems: 'center',
+    gap: 16,
   },
   button: {
     backgroundColor: '#2B76E5',
     width: '100%',
-    paddingVertical: 18,
+    paddingVertical: 17,
     borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#2B76E5',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
     elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D1D5DB',
+  },
+  activeDot: {
+    width: 24,
+    backgroundColor: '#0B47D1',
   },
 });
