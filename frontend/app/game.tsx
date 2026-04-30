@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { addXp, recordGamePlayed, fetchMyStats } from '../services/auth';
 import { useTranslation } from '../i18n';
+import { useLevelUpAnimation } from '../components/level-up-provider';
 
 function triggerHaptic(type: 'correct' | 'wrong' | 'shield') {
   if (Platform.OS === 'web') return;
@@ -112,6 +113,7 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { xpPerCorrect: number; totalQuestio
 export default function GameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { showLevelUp, syncPlayerLevel } = useLevelUpAnimation();
   const { level } = useLocalSearchParams();
   const difficulty = (['Easy', 'Medium', 'Hard'].includes(level as string)
     ? level as Difficulty
@@ -120,6 +122,7 @@ export default function GameScreen() {
   const { xpPerCorrect: baseXp, totalQuestions } = DIFFICULTY_CONFIG[difficulty];
 
   const [activePerk, setActivePerk] = useState<string | null>(null);
+  const [currentLevel, setCurrentLevel] = useState<number | null>(null);
   const [question, setQuestion] = useState<Question>(() => generateQuestion(difficulty));
   const [questionNumber, setQuestionNumber] = useState(1);
   const [score, setScore] = useState(0);
@@ -155,9 +158,12 @@ export default function GameScreen() {
 
   useEffect(() => {
     fetchMyStats().then((s) => {
-      if (s?.activePerk) setActivePerk(s.activePerk);
+      if (!s) return;
+      if (s.activePerk) setActivePerk(s.activePerk);
+      setCurrentLevel(s.level);
+      syncPlayerLevel(s.level);
     });
-  }, []);
+  }, [syncPlayerLevel]);
 
   const nextQuestion = useCallback(() => {
     if (questionNumber >= totalQuestions) {
@@ -217,7 +223,13 @@ export default function GameScreen() {
 
   const saveProgress = async () => {
     if (xpEarned > 0) {
-      await addXp(xpEarned);
+      const updatedStats = await addXp(xpEarned);
+      if (currentLevel !== null && updatedStats.level > currentLevel) {
+        showLevelUp(updatedStats.level);
+      } else {
+        syncPlayerLevel(updatedStats.level);
+      }
+      setCurrentLevel(updatedStats.level);
     }
     await recordGamePlayed();
   };

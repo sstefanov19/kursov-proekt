@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../Header';
 import { useTranslation } from '../../i18n';
-
-const { width } = Dimensions.get('window');
 
 interface Props {
   onNext: () => void;
@@ -17,67 +15,43 @@ export default function Slide3({ onNext, onSkip }: Props) {
     <SafeAreaView style={styles.container}>
       <Header onSkip={onSkip} />
 
-      <View style={styles.contentContainer}>
-        {/* Graphic Placeholder */}
-        <View style={styles.graphicContainer}>
-          <View style={styles.circleBg} />
-          <View style={styles.yellowSquare}>
-            <Text style={styles.chestPlaceholder}>🎁</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Illustration stage */}
+        <View style={styles.stage}>
+          <View style={styles.starsRow}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Text key={i} style={styles.star}>★</Text>
+            ))}
           </View>
-          {/* Floating Badges */}
-          <View style={[styles.badge, styles.badgeTopLeft]}>
-            <Text style={styles.badgeIconText}>★</Text>
+          <View style={styles.xpPill}>
+            <Text style={styles.xpText}>+ 240 XP</Text>
           </View>
-          <View style={[styles.badge, styles.badgeRight]}>
-            <View style={styles.coinBadge}>
-              <Text style={styles.coinText}>$</Text>
+          <View style={styles.levelRow}>
+            <View style={styles.levelBarBg}>
+              <View style={styles.levelBarActive} />
             </View>
-          </View>
-          <View style={[styles.badge, styles.badgeBottomRight]}>
-            <Text style={styles.badgeIconGreen}>🏅</Text>
+            <Text style={styles.levelBadge}>{t('level_label')} 12</Text>
           </View>
         </View>
 
+        {/* Text content */}
         <Text style={styles.title}>{t('onboarding_title3')}</Text>
         <Text style={styles.subtitle}>{t('onboarding_sub3')}</Text>
 
-        <View style={styles.cardsContainer}>
-          <View style={styles.levelCard}>
-            <View style={styles.levelHeader}>
-              <Text style={styles.levelLabel}>{t('onboarding_slide3_level_label')}</Text>
-              <Text style={styles.levelValue}>{t('level_label')} 12</Text>
-            </View>
-            <View style={styles.progressBarBg}>
-              <View style={styles.progressBarActive} />
-            </View>
-          </View>
+      </ScrollView>
 
-          <View style={styles.badgesRow}>
-            <View style={styles.pillCard}>
-              <View style={[styles.pillIcon, { backgroundColor: '#BBF7D0' }]}>
-                <Text>✨</Text>
-              </View>
-              <Text style={styles.pillText}>{t('onboarding_slide3_badge_fast')}</Text>
-            </View>
-            <View style={styles.pillCard}>
-              <View style={[styles.pillIcon, { backgroundColor: '#FEF08A' }]}>
-                <Text>🏆</Text>
-              </View>
-              <Text style={styles.pillText}>{t('onboarding_slide3_badge_gold')}</Text>
-            </View>
-          </View>
-        </View>
-
+      <View style={styles.actionZone}>
         <TouchableOpacity style={styles.button} onPress={onNext}>
           <Text style={styles.buttonText}>{t('onboarding_next')}</Text>
         </TouchableOpacity>
-
-        <View style={styles.dotsContainer}>
+        <View style={styles.dotsRow}>
           <View style={styles.dot} />
           <View style={styles.dot} />
-          <View style={styles.activeDotLabelContainer}>
-            <Text style={styles.activeDotLabel}>3/4</Text>
-          </View>
+          <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
         </View>
       </View>
@@ -88,207 +62,126 @@ export default function Slide3({ onNext, onSkip }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#F7F8FD',
   },
-  contentContainer: {
+  scroll: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 28,
+    paddingTop: 8,
+    paddingBottom: 16,
+    gap: 20,
+  },
+  stage: {
+    width: '100%',
+    backgroundColor: '#FEF9C3',
+    borderRadius: 32,
+    paddingVertical: 32,
     paddingHorizontal: 24,
-    paddingBottom: 20,
-  },
-  graphicContainer: {
     alignItems: 'center',
-    marginVertical: 20,
-    height: 240,
-    justifyContent: 'center',
+    gap: 18,
   },
-  circleBg: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: '#EEF2FF',
+  starsRow: {
+    flexDirection: 'row',
+    gap: 8,
   },
-  yellowSquare: {
-    width: 160,
-    height: 160,
-    backgroundColor: '#FACC15',
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+  star: {
+    fontSize: 32,
+    color: '#FACC15',
   },
-  chestPlaceholder: {
-    color: '#1E2B4D',
-    fontSize: 56,
-  },
-  badge: {
-    position: 'absolute',
+  xpPill: {
     backgroundColor: '#FFFFFF',
-    width: 48,
-    height: 48,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#0B47D1',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
   },
-  badgeTopLeft: {
-    top: 20,
-    left: width / 2 - 100,
+  xpText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#1E2B4D',
+    letterSpacing: 0.5,
   },
-  badgeRight: {
-    top: 60,
-    right: width / 2 - 120,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  badgeBottomRight: {
-    bottom: 20,
-    right: width / 2 - 100,
-  },
-  badgeIconText: {
-    fontSize: 24,
-    color: '#654321',
-  },
-  badgeIconGreen: {
-    fontSize: 20,
-  },
-  coinBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#654321',
-    justifyContent: 'center',
+  levelRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
+    gap: 12,
   },
-  coinText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 18,
+  levelBarBg: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#FDE68A',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  levelBarActive: {
+    width: '65%',
+    height: '100%',
+    backgroundColor: '#F59E0B',
+    borderRadius: 4,
+  },
+  levelBadge: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#92400E',
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '900',
     color: '#1E2B4D',
     textAlign: 'center',
-    marginBottom: 12,
+    lineHeight: 38,
   },
   subtitle: {
     fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 16,
+    lineHeight: 26,
+    marginTop: -8,
   },
-  cardsContainer: {
-    flex: 1,
-    gap: 12,
-    marginBottom: 16,
-  },
-  levelCard: {
-    backgroundColor: '#E0E7FF',
-    padding: 20,
-    borderRadius: 30,
-  },
-  levelHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  levelLabel: {
-    color: '#0B47D1',
-    fontWeight: '800',
-    fontSize: 12,
-    letterSpacing: 1,
-  },
-  levelValue: {
-    color: '#1E2B4D',
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: '#EEF2FF',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressBarActive: {
-    width: '60%',
-    height: '100%',
-    backgroundColor: '#4ADE80',
-    borderRadius: 4,
-  },
-  badgesRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  pillCard: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#E0E7FF',
-    padding: 12,
-    borderRadius: 24,
+  actionZone: {
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+    paddingTop: 8,
     alignItems: 'center',
-  },
-  pillIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  pillText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#1E2B4D',
-    flexShrink: 1,
+    gap: 16,
   },
   button: {
     backgroundColor: '#2B76E5',
     width: '100%',
-    paddingVertical: 18,
+    paddingVertical: 17,
     borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#2B76E5',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
     elevation: 8,
-    marginBottom: 20,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
   },
-  dotsContainer: {
+  dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E1E7F5',
-    marginHorizontal: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D1D5DB',
   },
-  activeDotLabelContainer: {
+  activeDot: {
     width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#FACC15',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  activeDotLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#1E2B4D',
+    backgroundColor: '#0B47D1',
   },
 });

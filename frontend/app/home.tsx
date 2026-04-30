@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,137 +7,12 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
-  Animated,
-  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUsername, getToken, getXp, getStreak, fetchMyStats, clearSession } from '../services/auth';
 import { useTranslation } from '../i18n';
-
-// ─── Confetti ────────────────────────────────────────────────────────────────
-
-const CONFETTI_COLORS = ['#FACC15', '#4ADE80', '#60A5FA', '#F87171', '#C084FC', '#FB923C', '#34D399', '#F9A8D4'];
-const SCREEN_H = Dimensions.get('window').height;
-
-function ConfettiPiece({ x, delay, color, size, isCircle }: {
-  x: number; delay: number; color: string; size: number; isCircle: boolean;
-}) {
-  const translateY = useRef(new Animated.Value(-60)).current;
-  const opacity    = useRef(new Animated.Value(1)).current;
-  const rotate     = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.sequence([
-      Animated.delay(delay),
-      Animated.parallel([
-        Animated.timing(translateY, { toValue: SCREEN_H + 80, duration: 2400, useNativeDriver: true }),
-        Animated.timing(rotate,     { toValue: 1,             duration: 2400, useNativeDriver: true }),
-        Animated.sequence([
-          Animated.delay(1600),
-          Animated.timing(opacity, { toValue: 0, duration: 600, useNativeDriver: true }),
-        ]),
-      ]),
-    ]).start();
-  }, [delay, opacity, rotate, translateY]);
-
-  const spin = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '540deg'] });
-
-  return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        left: `${x}%` as any,
-        top: 0,
-        width: size,
-        height: isCircle ? size : size * 0.6,
-        borderRadius: isCircle ? size / 2 : 3,
-        backgroundColor: color,
-        opacity,
-        transform: [{ translateY }, { rotate: spin }],
-      }}
-    />
-  );
-}
-
-function LevelUpOverlay({
-  visible,
-  level,
-  onDone,
-  title,
-  levelLabel,
-}: {
-  visible: boolean;
-  level: number;
-  onDone: () => void;
-  title: string;
-  levelLabel: string;
-}) {
-  const scale   = useRef(new Animated.Value(0)).current;
-  const bgOpacity = useRef(new Animated.Value(0)).current;
-
-  const pieces = useMemo(() => Array.from({ length: 40 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 96,
-    delay: Math.random() * 900,
-    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-    size: 8 + Math.random() * 10,
-    isCircle: Math.random() > 0.5,
-  })), []);
-
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.spring(scale,     { toValue: 1, useNativeDriver: true, bounciness: 14 }),
-        Animated.timing(bgOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]).start();
-      const t = setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(scale,     { toValue: 0, duration: 300, useNativeDriver: true }),
-          Animated.timing(bgOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-        ]).start(() => onDone());
-      }, 3000);
-      return () => clearTimeout(t);
-    }
-  }, [bgOpacity, onDone, scale, visible]);
-
-  if (!visible) return null;
-
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[StyleSheet.absoluteFillObject, { zIndex: 999, opacity: bgOpacity, backgroundColor: 'rgba(0,0,0,0.25)' }]}
-    >
-      {pieces.map(p => <ConfettiPiece key={p.id} {...p} />)}
-      <View style={overlayStyles.center}>
-        <Animated.View style={[overlayStyles.badge, { transform: [{ scale }] }]}>
-          <Text style={overlayStyles.emoji}>🎉</Text>
-          <Text style={overlayStyles.title}>{title}</Text>
-          <Text style={overlayStyles.sub}>{levelLabel} {level}</Text>
-        </Animated.View>
-      </View>
-    </Animated.View>
-  );
-}
-
-const overlayStyles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  badge: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 28,
-    paddingVertical: 32,
-    paddingHorizontal: 48,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.2,
-    shadowRadius: 24,
-    elevation: 16,
-  },
-  emoji: { fontSize: 56, marginBottom: 8 },
-  title: { fontSize: 34, fontWeight: '900', color: '#2563EB', letterSpacing: 1 },
-  sub:   { fontSize: 18, fontWeight: '700', color: '#64748B', marginTop: 4 },
-});
+import { useLevelUpAnimation } from '../components/level-up-provider';
 
 function getLevelName(level: number, t: (key: any) => string): string {
   const key = `level_${level}` as any;
@@ -156,14 +31,13 @@ function getLevelTitle(level: number, t: (key: any) => string): string {
 export default function HomeScreen() {
   const router = useRouter();
   const { t, lang, setLang } = useTranslation();
+  const { syncPlayerLevel } = useLevelUpAnimation();
   const [username, setUsername] = useState('');
   const [totalXp, setTotalXp] = useState(0);
   const [playerLevel, setPlayerLevel] = useState(1);
   const [streak, setStreak] = useState(0);
   const [rank, setRank] = useState(0);
   const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Medium');
-  const [showLevelUp, setShowLevelUp] = useState(false);
-  const prevLevelRef = useRef<number | null>(null);
   // XP curve: doubles every 5 levels (100, 100, ..., 200, 200, ..., 400, ...)
   const xpRequiredForLevel = (lvl: number) => {
     const tier = Math.floor((lvl - 1) / 5);
@@ -199,16 +73,12 @@ export default function HomeScreen() {
         if (stats) {
           setTotalXp(stats.xp);
           setRank(stats.rank);
-          const newLevel = stats.level;
-          if (prevLevelRef.current !== null && newLevel > prevLevelRef.current) {
-            setShowLevelUp(true);
-          }
-          prevLevelRef.current = newLevel;
-          setPlayerLevel(newLevel);
+          setPlayerLevel(stats.level);
+          syncPlayerLevel(stats.level);
         }
       };
       loadUser();
-    }, [router, t])
+    }, [router, syncPlayerLevel, t])
   );
 
   const handleLogout = async () => {
@@ -339,24 +209,12 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* DEV: test level-up animation — remove before release */}
-        <TouchableOpacity style={[styles.logoutButton, { marginBottom: 8, backgroundColor: 'rgba(37,99,235,0.08)' }]} onPress={() => setShowLevelUp(true)}>
-          <Text style={[styles.logoutText, { color: '#2563EB' }]}>{t('home_test_level_up')}</Text>
-        </TouchableOpacity>
-
         {/* Logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>{t('home_logout')}</Text>
         </TouchableOpacity>
 
       </ScrollView>
-      <LevelUpOverlay
-        visible={showLevelUp}
-        level={playerLevel}
-        onDone={() => setShowLevelUp(false)}
-        title={t('home_level_up_title')}
-        levelLabel={t('level_label')}
-      />
     </SafeAreaView>
   );
 }
