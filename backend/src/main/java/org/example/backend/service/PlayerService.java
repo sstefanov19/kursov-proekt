@@ -159,7 +159,17 @@ public class PlayerService {
                 user.getLevel(),
                 rank,
                 user.getActivePerk(),
-                user.getStreakCount()
+                currentStreak(user, LocalDate.now())
         );
+    }
+
+    private int currentStreak(User user, LocalDate today) {
+        LocalDate lastPlayedDate = user.getLastPlayedDate();
+
+        if (lastPlayedDate == null || lastPlayedDate.isBefore(today.minusDays(1))) {
+            return 0;
+        }
+
+        return user.getStreakCount();
     }
 }
