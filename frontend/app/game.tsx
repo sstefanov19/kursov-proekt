@@ -221,7 +221,7 @@ export default function GameScreen() {
     nextQuestion();
   };
 
-  const saveProgress = async () => {
+  const saveProgress = async ({ recordStreak = true }: { recordStreak?: boolean } = {}) => {
     if (xpEarned > 0) {
       const updatedStats = await addXp(xpEarned);
       if (currentLevel !== null && updatedStats.level > currentLevel) {
@@ -231,7 +231,9 @@ export default function GameScreen() {
       }
       setCurrentLevel(updatedStats.level);
     }
-    await recordGamePlayed();
+    if (recordStreak) {
+      await recordGamePlayed();
+    }
   };
 
   const handleFinish = async () => {
@@ -241,7 +243,7 @@ export default function GameScreen() {
 
   const handleExit = () => {
     const doExit = async () => {
-      await saveProgress();
+      await saveProgress({ recordStreak: xpEarned > 0 });
       router.replace('/home');
     };
     if (Platform.OS === 'web') {

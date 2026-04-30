@@ -32,6 +32,11 @@ public class PlayerController {
         return ResponseEntity.ok(stats);
     }
 
+    @PostMapping("/game-played")
+    public ResponseEntity<PlayerStats> recordGamePlayed(Authentication auth) {
+        return ResponseEntity.ok(playerService.recordGamePlayed(auth.getName()));
+    }
+
     @PostMapping("/perk")
     public ResponseEntity<PlayerStats> equipPerk(Authentication auth, @RequestBody EquipPerkRequest request) {
         return ResponseEntity.ok(playerService.equipPerk(auth.getName(), request.perk()));

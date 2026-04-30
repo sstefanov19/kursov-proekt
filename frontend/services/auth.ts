@@ -215,6 +215,7 @@ export async function addXp(amount: number): Promise<PlayerStats> {
     level: calculateLevelFromXp(next),
     rank: 0,
     activePerk: null,
+    streak: await getStreak(),
   };
 }
 
@@ -224,6 +225,7 @@ export interface PlayerStats {
   level: number;
   rank: number;
   activePerk: string | null;
+  streak: number;
 }
 
 export async function equipPerk(perk: string | null): Promise<PlayerStats | null> {
@@ -293,6 +295,11 @@ export async function fetchLeaderboard(page: number = 0): Promise<LeaderboardPag
 const STREAK_KEY = 'streak_count';
 const LAST_PLAYED_KEY = 'last_played_date';
 
+async function getUserScopedKey(key: string): Promise<string> {
+  const username = await getUsername();
+  return username ? `${key}_${username}` : key;
+}
+
 function todayStr(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -305,8 +312,10 @@ function yesterdayStr(): string {
 }
 
 export async function getStreak(): Promise<number> {
-  const streak = await getItem(STREAK_KEY);
-  const lastPlayed = await getItem(LAST_PLAYED_KEY);
+  const streakKey = await getUserScopedKey(STREAK_KEY);
+  const lastPlayedKey = await getUserScopedKey(LAST_PLAYED_KEY);
+  const streak = await getItem(streakKey);
+  const lastPlayed = await getItem(lastPlayedKey);
   const count = streak ? parseInt(streak, 10) : 0;
 
   // If last played was before yesterday, streak is broken
@@ -316,10 +325,19 @@ export async function getStreak(): Promise<number> {
   return count;
 }
 
-export async function recordGamePlayed(): Promise<number> {
+async function cacheStreak(streak: number, playedDate: string = todayStr()) {
+  const streakKey = await getUserScopedKey(STREAK_KEY);
+  const lastPlayedKey = await getUserScopedKey(LAST_PLAYED_KEY);
+  await setItem(streakKey, String(streak));
+  await setItem(lastPlayedKey, playedDate);
+}
+
+async function recordGamePlayedLocally(): Promise<number> {
   const today = todayStr();
-  const lastPlayed = await getItem(LAST_PLAYED_KEY);
-  const currentStreak = await getItem(STREAK_KEY);
+  const streakKey = await getUserScopedKey(STREAK_KEY);
+  const lastPlayedKey = await getUserScopedKey(LAST_PLAYED_KEY);
+  const lastPlayed = await getItem(lastPlayedKey);
+  const currentStreak = await getItem(streakKey);
   const count = currentStreak ? parseInt(currentStreak, 10) : 0;
 
   let newStreak: number;
@@ -334,17 +352,37 @@ export async function recordGamePlayed(): Promise<number> {
     newStreak = 1;
   }
 
-  await setItem(STREAK_KEY, String(newStreak));
-  await setItem(LAST_PLAYED_KEY, today);
+  await cacheStreak(newStreak, today);
   return newStreak;
+}
+
+export async function recordGamePlayed(): Promise<number> {
+  try {
+    const token = await getToken();
+    if (!token) return recordGamePlayedLocally();
+
+    const res = await fetch(`${PLAYER_API}/game-played`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    if (res.ok) {
+      const data: PlayerStats = await res.json();
+      await cacheStreak(data.streak);
+      await setItem(XP_KEY, String(data.xp));
+      return data.streak;
+    }
+  } catch {
+    // Offline — local streak cache is updated as a fallback.
+  }
+
+  return recordGamePlayedLocally();
 }
 
 export async function clearSession() {
   await removeItem(TOKEN_KEY);
   await removeItem(USERNAME_KEY);
   await removeItem(XP_KEY);
-  await removeItem(STREAK_KEY);
-  await removeItem(LAST_PLAYED_KEY);
 }
 
 export async function login(username: string, password: string): Promise<string> {

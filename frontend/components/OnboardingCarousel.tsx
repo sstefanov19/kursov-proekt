@@ -22,25 +22,25 @@ export default function OnboardingCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<FlatList>(null);
 
-  const navigateWithAuth = async (level: string) => {
+  const navigateWithAuth = async () => {
     const token = await getToken();
     if (token) {
       router.replace('/home');
     } else {
-      router.push({ pathname: '/login', params: { level } });
+      router.push('/login');
     }
   };
 
-  const goToNextSlide = (level?: string) => {
+  const goToNextSlide = () => {
     if (currentIndex < SLIDES.length - 1) {
       scrollRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
     } else {
-      navigateWithAuth(level || 'Medium');
+      navigateWithAuth();
     }
   };
 
   const skipOnboarding = () => {
-    navigateWithAuth('Medium');
+    navigateWithAuth();
   };
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {

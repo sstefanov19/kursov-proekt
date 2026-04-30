@@ -5,5 +5,6 @@ public record PlayerStats(
         int xp,
         int level,
         int rank,
-        String activePerk
+        String activePerk,
+        int streak
 ) {}

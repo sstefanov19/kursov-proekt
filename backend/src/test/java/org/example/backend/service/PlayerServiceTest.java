@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,9 +24,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceTest {
 
-    @Mock UserRepository userRepository;
+    @Mock
+    UserRepository userRepository;
 
-    @InjectMocks PlayerService playerService;
+    @InjectMocks
+    PlayerService playerService;
 
     // --- Pure-Java level math (no Spring context needed) ---
 
@@ -59,6 +62,61 @@ class PlayerServiceTest {
 
         assertThat(stats.xp()).isEqualTo(200);
         assertThat(stats.level()).isEqualTo(PlayerService.calculateLevel(200));
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void recordGamePlayed_firstPlay_startsStreak() {
+        User user = makeUser("alice", 0, 1);
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        when(userRepository.findRankByXp(anyInt())).thenReturn(1);
+
+        PlayerStats stats = playerService.recordGamePlayed("alice");
+
+        assertThat(stats.streak()).isEqualTo(1);
+        assertThat(user.getLastPlayedDate()).isEqualTo(LocalDate.now());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void recordGamePlayed_sameDay_keepsStreak() {
+        User user = makeUser("alice", 0, 1);
+        user.setStreakCount(3);
+        user.setLastPlayedDate(LocalDate.now());
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        when(userRepository.findRankByXp(anyInt())).thenReturn(1);
+
+        PlayerStats stats = playerService.recordGamePlayed("alice");
+
+        assertThat(stats.streak()).isEqualTo(3);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void recordGamePlayed_nextDay_incrementsStreak() {
+        User user = makeUser("alice", 0, 1);
+        user.setStreakCount(3);
+        user.setLastPlayedDate(LocalDate.now().minusDays(1));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        when(userRepository.findRankByXp(anyInt())).thenReturn(1);
+
+        PlayerStats stats = playerService.recordGamePlayed("alice");
+
+        assertThat(stats.streak()).isEqualTo(4);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void recordGamePlayed_afterMissedDay_resetsStreak() {
+        User user = makeUser("alice", 0, 1);
+        user.setStreakCount(3);
+        user.setLastPlayedDate(LocalDate.now().minusDays(2));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        when(userRepository.findRankByXp(anyInt())).thenReturn(1);
+
+        PlayerStats stats = playerService.recordGamePlayed("alice");
+
+        assertThat(stats.streak()).isEqualTo(1);
         verify(userRepository).save(user);
     }
 

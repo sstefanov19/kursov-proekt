@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @Table(name = "users")
@@ -34,4 +36,10 @@ public class User {
 
     @Column
     private String activePerk;
+
+    @Column(nullable = false)
+    private int streakCount = 0;
+
+    @Column
+    private LocalDate lastPlayedDate;
 }
