@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,6 +77,13 @@ public class PlayerService {
         return toStats(user);
     }
 
+    public PlayerStats recordGamePlayed(String username) {
+        User user = getUserOrThrow(username);
+        updateStreak(user, LocalDate.now());
+        userRepository.save(user);
+        return toStats(user);
+    }
+
     public PlayerStats equipPerk(String username, String perk) {
         User user = getUserOrThrow(username);
 
@@ -127,6 +135,22 @@ public class PlayerService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    private void updateStreak(User user, LocalDate today) {
+        LocalDate lastPlayedDate = user.getLastPlayedDate();
+
+        if (today.equals(lastPlayedDate)) {
+            return;
+        }
+
+        if (today.minusDays(1).equals(lastPlayedDate)) {
+            user.setStreakCount(user.getStreakCount() + 1);
+        } else {
+            user.setStreakCount(1);
+        }
+
+        user.setLastPlayedDate(today);
+    }
+
     private PlayerStats toStats(User user) {
         int rank = userRepository.findRankByXp(user.getXp());
         return new PlayerStats(
@@ -134,7 +158,18 @@ public class PlayerService {
                 user.getXp(),
                 user.getLevel(),
                 rank,
-                user.getActivePerk()
+                user.getActivePerk(),
+                currentStreak(user, LocalDate.now())
         );
+    }
+
+    private int currentStreak(User user, LocalDate today) {
+        LocalDate lastPlayedDate = user.getLastPlayedDate();
+
+        if (lastPlayedDate == null || lastPlayedDate.isBefore(today.minusDays(1))) {
+            return 0;
+        }
+
+        return user.getStreakCount();
     }
 }

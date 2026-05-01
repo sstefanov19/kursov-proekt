@@ -74,6 +74,7 @@ export default function HomeScreen() {
           setTotalXp(stats.xp);
           setRank(stats.rank);
           setPlayerLevel(stats.level);
+          setStreak(stats.streak);
           syncPlayerLevel(stats.level);
         }
       };

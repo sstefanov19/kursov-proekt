@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -104,10 +104,10 @@ function generateQuestion(difficulty: Difficulty): Question {
   return { text: `${a} ${op} ${b}`, correctAnswer: answer, options };
 }
 
-const DIFFICULTY_CONFIG: Record<Difficulty, { xpPerCorrect: number; totalQuestions: number }> = {
-  Easy:   { xpPerCorrect: 5,  totalQuestions: 10 },
-  Medium: { xpPerCorrect: 10, totalQuestions: 10 },
-  Hard:   { xpPerCorrect: 20, totalQuestions: 5 },
+const DIFFICULTY_CONFIG: Record<Difficulty, { xpPerCorrect: number; totalQuestions: number; secondsPerQuestion: number }> = {
+  Easy:   { xpPerCorrect: 5,  totalQuestions: 10, secondsPerQuestion: 20 },
+  Medium: { xpPerCorrect: 10, totalQuestions: 10, secondsPerQuestion: 15 },
+  Hard:   { xpPerCorrect: 20, totalQuestions: 5,  secondsPerQuestion: 12 },
 };
 
 export default function GameScreen() {
@@ -119,7 +119,7 @@ export default function GameScreen() {
     ? level as Difficulty
     : 'Medium');
 
-  const { xpPerCorrect: baseXp, totalQuestions } = DIFFICULTY_CONFIG[difficulty];
+  const { xpPerCorrect: baseXp, totalQuestions, secondsPerQuestion } = DIFFICULTY_CONFIG[difficulty];
 
   const [activePerk, setActivePerk] = useState<string | null>(null);
   const [currentLevel, setCurrentLevel] = useState<number | null>(null);
@@ -131,6 +131,9 @@ export default function GameScreen() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [hiddenOptions, setHiddenOptions] = useState<Set<number>>(new Set());
+  const [timeLeft, setTimeLeft] = useState(secondsPerQuestion);
+  const advanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const questionResolvedRef = useRef(false);
 
   // Perk uses remaining this game
   const [shieldUsed, setShieldUsed] = useState(false);
@@ -175,10 +178,59 @@ export default function GameScreen() {
     setFeedback(null);
     setSelectedAnswer(null);
     setHiddenOptions(new Set());
-  }, [questionNumber, difficulty, totalQuestions]);
+    setTimeLeft(secondsPerQuestion);
+    questionResolvedRef.current = false;
+  }, [questionNumber, difficulty, totalQuestions, secondsPerQuestion]);
+
+  const scheduleNextQuestion = useCallback(() => {
+    if (advanceTimeoutRef.current) {
+      clearTimeout(advanceTimeoutRef.current);
+    }
+    advanceTimeoutRef.current = setTimeout(() => {
+      advanceTimeoutRef.current = null;
+      nextQuestion();
+    }, 800);
+  }, [nextQuestion]);
+
+  useEffect(() => {
+    setTimeLeft(secondsPerQuestion);
+  }, [secondsPerQuestion, questionNumber]);
+
+  useEffect(() => {
+    if (gameOver || feedback !== null) return;
+
+    const timerId = setInterval(() => {
+      setTimeLeft((current) => {
+        if (questionResolvedRef.current) {
+          return current;
+        }
+        if (current <= 1) {
+          clearInterval(timerId);
+          questionResolvedRef.current = true;
+          triggerHaptic('wrong');
+          setFeedback('wrong');
+          setSelectedAnswer(null);
+          scheduleNextQuestion();
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [feedback, gameOver, questionNumber, scheduleNextQuestion]);
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimeoutRef.current) {
+        clearTimeout(advanceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleAnswer = (chosen: number) => {
-    if (feedback !== null) return;
+    if (feedback !== null || questionResolvedRef.current) return;
+    questionResolvedRef.current = true;
     setSelectedAnswer(chosen);
 
     if (chosen === question.correctAnswer) {
@@ -191,6 +243,7 @@ export default function GameScreen() {
       if (activePerk === 'shield' && !shieldUsed) {
         triggerHaptic('shield');
         setShieldUsed(true);
+        questionResolvedRef.current = false;
         setFeedback(null);
         setSelectedAnswer(null);
         // Don't advance — let them try again (the wrong option stays visible)
@@ -200,7 +253,7 @@ export default function GameScreen() {
       setFeedback('wrong');
     }
 
-    setTimeout(() => { nextQuestion(); }, 800);
+    scheduleNextQuestion();
   };
 
   const useHint = () => {
@@ -216,12 +269,12 @@ export default function GameScreen() {
   };
 
   const useSkip = () => {
-    if (skipUsed) return;
+    if (skipUsed || feedback !== null) return;
     setSkipUsed(true);
     nextQuestion();
   };
 
-  const saveProgress = async () => {
+  const saveProgress = async ({ recordStreak = true }: { recordStreak?: boolean } = {}) => {
     if (xpEarned > 0) {
       const updatedStats = await addXp(xpEarned);
       if (currentLevel !== null && updatedStats.level > currentLevel) {
@@ -231,7 +284,9 @@ export default function GameScreen() {
       }
       setCurrentLevel(updatedStats.level);
     }
-    await recordGamePlayed();
+    if (recordStreak) {
+      await recordGamePlayed();
+    }
   };
 
   const handleFinish = async () => {
@@ -241,7 +296,7 @@ export default function GameScreen() {
 
   const handleExit = () => {
     const doExit = async () => {
-      await saveProgress();
+      await saveProgress({ recordStreak: xpEarned > 0 });
       router.replace('/home');
     };
     if (Platform.OS === 'web') {
@@ -284,8 +339,23 @@ export default function GameScreen() {
       </View>
 
       <View style={styles.scoreBoard}>
-        <Text style={styles.scoreLabel}>{t('game_score')}</Text>
-        <Text style={styles.score}>{score}</Text>
+        <View style={styles.scoreColumn}>
+          <Text style={styles.scoreLabel}>{t('game_score')}</Text>
+          <Text style={styles.score}>{score}</Text>
+        </View>
+        <View style={[
+          styles.timerPill,
+          timeLeft <= 5 && styles.timerPillDanger,
+        ]}>
+          <Text style={[
+            styles.timerLabel,
+            timeLeft <= 5 && styles.timerLabelDanger,
+          ]}>{t('game_time_left')}</Text>
+          <Text style={[
+            styles.timerValue,
+            timeLeft <= 5 && styles.timerValueDanger,
+          ]}>{timeLeft}s</Text>
+        </View>
       </View>
 
       <Text style={styles.mathQuestion}>{question.text} = ?</Text>
@@ -358,9 +428,26 @@ const styles = StyleSheet.create({
   questionCount: { fontSize: 16, fontWeight: '700', color: '#64748B' },
   scoreBoard: {
     backgroundColor: '#E0E7FF', padding: 20, borderRadius: 24, width: '100%', alignItems: 'center', marginBottom: 32,
+    flexDirection: 'row', justifyContent: 'space-between',
   },
+  scoreColumn: { flex: 1, alignItems: 'center' },
   scoreLabel: { fontSize: 12, fontWeight: '800', color: '#0B47D1', marginBottom: 4 },
   score: { fontSize: 40, fontWeight: '900', color: '#1E2B4D' },
+  timerPill: {
+    minWidth: 92,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  timerPillDanger: {
+    backgroundColor: '#FEE2E2',
+  },
+  timerLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', marginBottom: 2 },
+  timerLabelDanger: { color: '#B91C1C' },
+  timerValue: { fontSize: 24, fontWeight: '900', color: '#0B47D1' },
+  timerValueDanger: { color: '#DC2626' },
   mathQuestion: { fontSize: 36, fontWeight: '900', color: '#1E2B4D', marginBottom: 32 },
   answersGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, width: '100%', marginBottom: 16 },
   answerBtn: {

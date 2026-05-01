@@ -1,22 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../Header';
 import { useTranslation } from '../../i18n';
 
 interface Props {
-  onNext: (level?: string) => void;
+  onNext: () => void;
   onSkip: () => void;
 }
 
 export default function Slide4({ onNext, onSkip }: Props) {
-  const [selectedLevel, setSelectedLevel] = useState('Medium');
   const { t } = useTranslation();
 
-  const levelLabel = (level: string) => {
-    if (level === 'Easy') return t('home_easy');
-    if (level === 'Hard') return t('home_hard');
-    return t('home_medium');
-  };
+  const setupItems = [
+    { icon: '🔐', title: t('onboarding_slide4_card1_title'), desc: t('onboarding_slide4_card1_desc') },
+    { icon: '🎯', title: t('onboarding_slide4_card2_title'), desc: t('onboarding_slide4_card2_desc') },
+    { icon: '📈', title: t('onboarding_slide4_card3_title'), desc: t('onboarding_slide4_card3_desc') },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -30,24 +29,23 @@ export default function Slide4({ onNext, onSkip }: Props) {
         <Text style={styles.title}>{t('onboarding_title4')}</Text>
         <Text style={styles.subtitle}>{t('onboarding_sub4')}</Text>
 
-        <Text style={styles.levelLabel}>{t('onboarding_slide4_level_label')}</Text>
-        <View style={styles.levelCard}>
-          {['Easy', 'Medium', 'Hard'].map((lvl) => (
-            <TouchableOpacity
-              key={lvl}
-              style={selectedLevel === lvl ? styles.levelBtnActive : styles.levelBtnInactive}
-              onPress={() => setSelectedLevel(lvl)}
-            >
-              <Text style={selectedLevel === lvl ? styles.levelBtnTextActive : styles.levelBtnTextInactive}>
-                {levelLabel(lvl)}
-              </Text>
-            </TouchableOpacity>
+        <View style={styles.setupList}>
+          {setupItems.map((item) => (
+            <View key={item.title} style={styles.setupCard}>
+              <View style={styles.setupIcon}>
+                <Text style={styles.setupIconText}>{item.icon}</Text>
+              </View>
+              <View style={styles.setupTextBlock}>
+                <Text style={styles.setupTitle}>{item.title}</Text>
+                <Text style={styles.setupDesc}>{item.desc}</Text>
+              </View>
+            </View>
           ))}
         </View>
 
         <View style={styles.infoBadge}>
           <View style={styles.infoIcon}>
-            <Text style={styles.infoIconEmoji}>🛡️</Text>
+            <Text style={styles.infoIconEmoji}>⚙️</Text>
           </View>
           <View style={styles.infoTextBlock}>
             <Text style={styles.infoTitle}>{t('onboarding_slide4_info_title')}</Text>
@@ -57,7 +55,7 @@ export default function Slide4({ onNext, onSkip }: Props) {
       </ScrollView>
 
       <View style={styles.actionZone}>
-        <TouchableOpacity style={styles.button} onPress={() => onNext(selectedLevel)}>
+        <TouchableOpacity style={styles.button} onPress={onNext}>
           <Text style={styles.buttonText}>{t('onboarding_play')} →</Text>
         </TouchableOpacity>
         <View style={styles.dotsRow}>
@@ -66,7 +64,7 @@ export default function Slide4({ onNext, onSkip }: Props) {
           <View style={styles.dot} />
           <View style={[styles.dot, styles.activeDot]} />
         </View>
-        <TouchableOpacity onPress={() => onNext(selectedLevel)}>
+        <TouchableOpacity onPress={onNext}>
           <Text style={styles.linkText}>{t('onboarding_slide4_secondary')}</Text>
         </TouchableOpacity>
       </View>
@@ -102,42 +100,46 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 26,
   },
-  levelLabel: {
-    fontSize: 13,
-    fontWeight: '700',
+  setupList: {
+    gap: 10,
+  },
+  setupCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 14,
+    gap: 12,
+    shadowColor: '#0B47D1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  setupIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#E0E7FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  setupIconText: {
+    fontSize: 22,
+  },
+  setupTextBlock: {
+    flex: 1,
+    gap: 2,
+  },
+  setupTitle: {
+    fontSize: 15,
+    fontWeight: '800',
     color: '#1E2B4D',
   },
-  levelCard: {
-    backgroundColor: '#EEF2FF',
-    borderRadius: 20,
-    padding: 8,
-    gap: 4,
-  },
-  levelBtnInactive: {
-    paddingVertical: 14,
-    alignItems: 'center',
-    borderRadius: 14,
-  },
-  levelBtnTextInactive: {
+  setupDesc: {
+    fontSize: 13,
     color: '#64748B',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  levelBtnActive: {
-    backgroundColor: '#0B47D1',
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: 'center',
-    shadowColor: '#0B47D1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  levelBtnTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 16,
+    lineHeight: 19,
   },
   infoBadge: {
     flexDirection: 'row',
