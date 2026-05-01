@@ -1,10 +1,33 @@
+import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import type { TranslationKeys } from '../i18n';
 
-const API_BASE = 'http://localhost:8080/api/v1/auth';
-const PLAYER_API = 'http://localhost:8080/api/v1/player';
-const CLASSROOM_API = 'http://localhost:8080/api/v1/classrooms';
+const DEFAULT_API_ORIGIN = 'http://localhost:8080';
+
+function trimTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
+function resolveApiOrigin(): string {
+  const envOrigin = process.env.EXPO_PUBLIC_API_ORIGIN?.trim();
+  if (envOrigin) return trimTrailingSlash(envOrigin);
+
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const [host] = hostUri.split(':');
+    if (host && host !== 'localhost' && host !== '127.0.0.1') {
+      return `http://${host}:8080`;
+    }
+  }
+
+  return DEFAULT_API_ORIGIN;
+}
+
+const API_ORIGIN = resolveApiOrigin();
+const API_BASE = `${API_ORIGIN}/api/v1/auth`;
+const PLAYER_API = `${API_ORIGIN}/api/v1/player`;
+const CLASSROOM_API = `${API_ORIGIN}/api/v1/classrooms`;
 const TOKEN_KEY = 'jwt_token';
 const USERNAME_KEY = 'username';
 
@@ -119,7 +142,7 @@ export function getLocalizedErrorMessage(
   const rawMessage = apiError?.message;
 
   if (!rawMessage || rawMessage === 'Failed to fetch' || rawMessage === 'Network request failed') {
-    return t(fallbackKey);
+    return t('error_network');
   }
 
   const fieldErrors = apiError?.fieldErrors ? Object.values(apiError.fieldErrors).filter(Boolean) : [];

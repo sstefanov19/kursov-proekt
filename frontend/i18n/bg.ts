@@ -53,6 +53,7 @@ export default {
   login_fill_all_fields: 'Моля, попълнете всички полета.',
   login_generic_error: 'Възникна грешка.',
   error_server: 'Възникна сървърна грешка.',
+  error_network: 'Няма връзка със сървъра. Проверете дали телефонът и компютърът са в една мрежа и backend-ът работи.',
   error_invalid_credentials: 'Невалидно потребителско име или парола.',
   error_username_taken: 'Това потребителско име вече е заето.',
   error_email_taken: 'Този имейл вече се използва.',

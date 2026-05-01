@@ -53,6 +53,7 @@ export default {
   login_fill_all_fields: 'Please fill in all fields.',
   login_generic_error: 'Something went wrong.',
   error_server: 'A server error occurred.',
+  error_network: 'Cannot reach the server. Make sure your phone and computer are on the same network and the backend is running.',
   error_invalid_credentials: 'Invalid username or password.',
   error_username_taken: 'This username is already taken.',
   error_email_taken: 'This email is already in use.',
