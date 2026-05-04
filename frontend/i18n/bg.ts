@@ -9,7 +9,7 @@ export default {
 
   // Onboarding
   onboarding_title1: 'Добре дошли в Математическо приключение!',
-  onboarding_sub1: 'Учи математика докато играеш и спасяваш замъци!',
+  onboarding_sub1: 'Учи математика докато играеш и се изкачваш в класацията!',
   onboarding_title2: 'Решавай задачи като герой',
   onboarding_sub2: 'Математически предизвикателства те чакат на всяка стъпка',
   onboarding_title3: 'Печели награди за всяка задача',
@@ -24,8 +24,8 @@ export default {
   onboarding_step_4: 'СТЪПКА 4/4',
   onboarding_slide1_cta: 'Започни пътешествието',
   onboarding_slide2_card1: 'Отговаряй на математически въпроси',
-  onboarding_slide2_card2: 'Защитавай замъци и побеждавай босове',
-  onboarding_slide2_card3: 'Събирай монети, звезди и XP',
+  onboarding_slide2_card2: 'Предизвиквай приятели и съперници в математически двубои',
+  onboarding_slide2_card3: 'Събирай XP',
   onboarding_slide3_level_label: 'НИВО НА РАЗВИТИЕ',
   onboarding_slide4_level_label: 'Изберете ниво по математика',
   onboarding_slide4_card1_title: 'Запазен прогрес',

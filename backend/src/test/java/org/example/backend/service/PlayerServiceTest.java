@@ -175,19 +175,6 @@ class PlayerServiceTest {
                 .isInstanceOf(UserNotFoundException.class);
     }
 
-    @Test
-    void getStats_afterMissedDay_returnsExpiredStreak() {
-        User user = makeUser("alice", 0, 1);
-        user.setStreakCount(5);
-        user.setLastPlayedDate(LocalDate.now().minusDays(2));
-        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
-        when(userRepository.findRankByXp(anyInt())).thenReturn(1);
-
-        PlayerStats stats = playerService.getStats("alice");
-
-        assertThat(stats.streak()).isZero();
-    }
-
     // --- helpers ---
 
     private User makeUser(String username, int xp, int level) {

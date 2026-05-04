@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Image } from 'react-native';
 import Header from '../Header';
 import { useTranslation } from '../../i18n';
 
@@ -27,17 +27,12 @@ export default function Slide2({ onNext, onSkip }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Illustration stage */}
-        <View style={styles.stage}>
-          <View style={styles.chipsRow}>
-            {FEATURES.map((f) => (
-              <View key={f.emoji} style={[styles.chip, { backgroundColor: f.bg }]}>
-                <Text style={styles.chipEmoji}>{f.emoji}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={styles.mathBubble}>
-            <Text style={styles.mathText}>12 + 8 = ?</Text>
-          </View>
+        <View style={styles.stageContainer}>
+          <Image
+            source={require('../../public/slide2.png')}
+            style={styles.stageImage}
+            resizeMode="cover"
+          />
         </View>
 
         {/* Text content */}
@@ -86,44 +81,15 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     gap: 20,
   },
-  stage: {
+  stageContainer: {
     width: '100%',
-    backgroundColor: '#EEF2FF',
+    aspectRatio: 1024 / 480,
     borderRadius: 32,
-    paddingVertical: 28,
-    alignItems: 'center',
-    gap: 16,
+    overflow: 'hidden',
   },
-  chipsRow: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  chip: {
-    width: 72,
-    height: 72,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chipEmoji: {
-    fontSize: 32,
-  },
-  mathBubble: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    shadowColor: '#0B47D1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  mathText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1E2B4D',
-    letterSpacing: 1,
+  stageImage: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 30,

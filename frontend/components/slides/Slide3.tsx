@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Image } from 'react-native';
 import Header from '../Header';
 import { useTranslation } from '../../i18n';
 
@@ -21,21 +21,12 @@ export default function Slide3({ onNext, onSkip }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Illustration stage */}
-        <View style={styles.stage}>
-          <View style={styles.starsRow}>
-            {[0, 1, 2, 3, 4].map((i) => (
-              <Text key={i} style={styles.star}>★</Text>
-            ))}
-          </View>
-          <View style={styles.xpPill}>
-            <Text style={styles.xpText}>+ 240 XP</Text>
-          </View>
-          <View style={styles.levelRow}>
-            <View style={styles.levelBarBg}>
-              <View style={styles.levelBarActive} />
-            </View>
-            <Text style={styles.levelBadge}>{t('level_label')} 12</Text>
-          </View>
+        <View style={styles.stageContainer}>
+          <Image
+            source={require('../../public/slide3.png')}
+            style={styles.stageImage}
+            resizeMode="cover"
+          />
         </View>
 
         {/* Text content */}
@@ -73,63 +64,15 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     gap: 20,
   },
-  stage: {
+  stageContainer: {
     width: '100%',
-    backgroundColor: '#FEF9C3',
+    aspectRatio: 1024 / 480,
     borderRadius: 32,
-    paddingVertical: 32,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    gap: 18,
-  },
-  starsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  star: {
-    fontSize: 32,
-    color: '#FACC15',
-  },
-  xpPill: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 28,
-    paddingVertical: 12,
-    borderRadius: 24,
-    shadowColor: '#0B47D1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  xpText: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#1E2B4D',
-    letterSpacing: 0.5,
-  },
-  levelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    gap: 12,
-  },
-  levelBarBg: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#FDE68A',
-    borderRadius: 4,
     overflow: 'hidden',
   },
-  levelBarActive: {
-    width: '65%',
+  stageImage: {
+    width: '100%',
     height: '100%',
-    backgroundColor: '#F59E0B',
-    borderRadius: 4,
-  },
-  levelBadge: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#92400E',
   },
   title: {
     fontSize: 30,

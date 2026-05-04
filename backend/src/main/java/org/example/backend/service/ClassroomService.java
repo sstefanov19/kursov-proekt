@@ -12,6 +12,8 @@ import org.example.backend.repository.ClassroomRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,7 @@ public class ClassroomService {
     private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public ClassroomResponse create(String username, String name) {
         User user = getUserOrThrow(username);
 
@@ -38,6 +41,7 @@ public class ClassroomService {
         return toResponse(classroom);
     }
 
+    @Transactional
     public ClassroomResponse join(String username, String code) {
         User user = getUserOrThrow(username);
         Classroom classroom = getClassroomByCodeOrThrow(code);
@@ -47,6 +51,7 @@ public class ClassroomService {
         return toResponse(classroom);
     }
 
+    @Transactional
     public void leave(String username, Long classroomId) {
         User user = getUserOrThrow(username);
         Classroom classroom = getClassroomByIdOrThrow(classroomId);
@@ -55,6 +60,7 @@ public class ClassroomService {
         classroomRepository.save(classroom);
     }
 
+    @Transactional(readOnly = true)
     public List<ClassroomResponse> getMyClassrooms(String username) {
         User user = getUserOrThrow(username);
 
@@ -63,6 +69,7 @@ public class ClassroomService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public LeaderboardPage getClassroomLeaderboard(String code, int page) {
         Classroom classroom = getClassroomByCodeOrThrow(code);
 
@@ -85,8 +92,7 @@ public class ClassroomService {
                         position.getAndIncrement(),
                         u.getUsername(),
                         u.getXp(),
-                        u.getXp() / 100 + 1
-                ))
+                        u.getXp() / 100 + 1))
                 .toList();
 
         return new LeaderboardPage(entries, page, totalPages, total);
@@ -121,7 +127,6 @@ public class ClassroomService {
                 c.getName(),
                 c.getCode(),
                 c.getCreatedBy().getUsername(),
-                c.getMembers().size()
-        );
+                c.getMembers().size());
     }
 }

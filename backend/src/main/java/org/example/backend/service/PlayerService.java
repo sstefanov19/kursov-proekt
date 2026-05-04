@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
@@ -31,8 +33,7 @@ public class PlayerService {
             "shield", 5,
             "double_xp", 10,
             "skip", 15,
-            "triple_xp", 20
-    );
+            "triple_xp", 20);
 
     /**
      * XP required per level, doubling every 5 levels:
@@ -41,7 +42,7 @@ public class PlayerService {
      */
     public static int xpRequiredForLevel(int level) {
         int tier = (level - 1) / 5; // 0 for levels 1-5, 1 for 6-10, etc.
-        return 100 * (1 << tier);   // 100, 200, 400, 800, ...
+        return 100 * (1 << tier); // 100, 200, 400, 800, ...
     }
 
     public static int totalXpForLevel(int level) {
@@ -62,6 +63,7 @@ public class PlayerService {
         return level;
     }
 
+    @Transactional
     public PlayerStats addXp(String username, int xpToAdd) {
         User user = getUserOrThrow(username);
 
@@ -72,11 +74,13 @@ public class PlayerService {
         return toStats(user);
     }
 
+    @Transactional(readOnly = true)
     public PlayerStats getStats(String username) {
         User user = getUserOrThrow(username);
         return toStats(user);
     }
 
+    @Transactional
     public PlayerStats recordGamePlayed(String username) {
         User user = getUserOrThrow(username);
         updateStreak(user, LocalDate.now());
@@ -84,6 +88,7 @@ public class PlayerService {
         return toStats(user);
     }
 
+    @Transactional
     public PlayerStats equipPerk(String username, String perk) {
         User user = getUserOrThrow(username);
 
@@ -101,8 +106,7 @@ public class PlayerService {
         int requiredLevel = PERK_REQUIREMENTS.get(perk);
         if (user.getLevel() < requiredLevel) {
             throw new PerkRequirementNotMetException(
-                    "You need level " + requiredLevel + " to unlock this perk"
-            );
+                    "You need level " + requiredLevel + " to unlock this perk");
         }
 
         user.setActivePerk(perk);
@@ -114,6 +118,7 @@ public class PlayerService {
         return PERK_REQUIREMENTS.keySet();
     }
 
+    @Transactional(readOnly = true)
     public LeaderboardPage getLeaderboard(int page) {
         Page<User> userPage = userRepository.findAllByOrderByXpDesc(PageRequest.of(page, PAGE_SIZE));
         AtomicInteger position = new AtomicInteger(page * PAGE_SIZE + 1);
@@ -123,8 +128,7 @@ public class PlayerService {
                         position.getAndIncrement(),
                         u.getUsername(),
                         u.getXp(),
-                        calculateLevel(u.getXp())
-                ))
+                        calculateLevel(u.getXp())))
                 .toList();
 
         return new LeaderboardPage(entries, page, userPage.getTotalPages(), userPage.getTotalElements());
@@ -159,8 +163,7 @@ public class PlayerService {
                 user.getLevel(),
                 rank,
                 user.getActivePerk(),
-                currentStreak(user, LocalDate.now())
-        );
+                currentStreak(user, LocalDate.now()));
     }
 
     private int currentStreak(User user, LocalDate today) {
